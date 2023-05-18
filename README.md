@@ -206,7 +206,6 @@ It is also worth noting that [Java SE 8](https://www.java.com/en/download/manual
 
 The repository includes the following directories:
 
-* Package `data` can be used to store image datasets as well as CSV files needed to train networks;
 * Package `main_net_classes` contains various convolutional neural network architectures that can serve as examples for initializing your network in RevelioNN; 
 * Package `ontologies` contains examples of ontology files in OWL format, as well as examples of the dictionary of relations of dataset attributes to ontology concepts and examples of the class representing the ontology as a graph;
 * Package `examples` includes notebooks that contain practical examples of RevelioNN use;
