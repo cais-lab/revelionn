@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>revelionn.occlusion &mdash; RevelioNN  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            RevelioNN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scenarios.html">Usage Scenarios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced_usage.html">Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">RevelioNN Modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">RevelioNN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">revelionn.occlusion</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for revelionn.occlusion</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">PIL</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">smqtk_classifier</span> <span class="kn">import</span> <span class="n">ClassifyImage</span>
+<span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">transforms</span>
+<span class="kn">from</span> <span class="nn">xaitk_saliency</span> <span class="kn">import</span> <span class="n">GenerateImageClassifierBlackboxSaliency</span>
+<span class="kn">from</span> <span class="nn">xaitk_saliency.impls.gen_image_classifier_blackbox_sal.slidingwindow</span> <span class="kn">import</span> <span class="n">SlidingWindowStack</span>
+
+<span class="kn">from</span> <span class="nn">revelionn.mapping_nets.simultaneous_mapping_net</span> <span class="kn">import</span> <span class="n">SimultaneousMappingNet</span>
+<span class="kn">from</span> <span class="nn">revelionn.utils.explanation</span> <span class="kn">import</span> <span class="n">extract_concepts_from_img</span>
+
+<span class="n">image_filename</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="n">class_labels</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">positive_classes_idx</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<div class="viewcode-block" id="perform_occlusion"><a class="viewcode-back" href="../../modules.html#revelionn.occlusion.perform_occlusion">[docs]</a><span class="k">def</span> <span class="nf">perform_occlusion</span><span class="p">(</span><span class="n">main_module</span><span class="p">,</span> <span class="n">mapping_module</span><span class="p">,</span> <span class="n">activation_extractor</span><span class="p">,</span> <span class="n">transformation</span><span class="p">,</span> <span class="n">img_size</span><span class="p">,</span>
+                      <span class="n">path_to_img</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="n">stride</span><span class="p">,</span> <span class="n">threads</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Highlights concepts extracted by the mapping network in the image by occlusion.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    main_module : MainModelProcessing</span>
+<span class="sd">        Class for training, evaluation and processing the main network model.</span>
+<span class="sd">    mapping_module : MappingModelProcessing</span>
+<span class="sd">        Class for training, evaluation and processing the mapping network model.</span>
+<span class="sd">    activation_extractor : ActivationExtractor</span>
+<span class="sd">        Class for identifying layers of a convolutional neural network and for extracting activations produced during</span>
+<span class="sd">        network inference.</span>
+<span class="sd">    transformation : torchvision.transforms</span>
+<span class="sd">        A transform to apply to the image.</span>
+<span class="sd">    img_size : int</span>
+<span class="sd">        The size of the image side.</span>
+<span class="sd">    path_to_img : str</span>
+<span class="sd">        Image file path.</span>
+<span class="sd">    window_size : int</span>
+<span class="sd">        The block window size.</span>
+<span class="sd">    stride : int</span>
+<span class="sd">        The sliding window striding step.</span>
+<span class="sd">    threads : int</span>
+<span class="sd">        Optional number threads to use to enable parallelism in applying perturbation masks to an input image.</span>
+<span class="sd">        If 0, a negative value, or None, work will be performed on the main-thread in-line.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    plt : matplotlib.pyplot</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">transform</span> <span class="ow">in</span> <span class="n">transformation</span><span class="o">.</span><span class="n">transforms</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">):</span>
+            <span class="n">mean</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">mean</span>
+            <span class="k">break</span>
+
+    <span class="n">model_loader</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span><span class="n">transforms</span><span class="o">.</span><span class="n">ToPILImage</span><span class="p">(),</span> <span class="n">transformation</span><span class="p">])</span>
+    <span class="n">blackbox_classifier</span> <span class="o">=</span> <span class="n">MultiLabelClassifier</span><span class="p">(</span><span class="n">main_module</span><span class="p">,</span> <span class="n">mapping_module</span><span class="p">,</span> <span class="n">activation_extractor</span><span class="p">,</span> <span class="n">model_loader</span><span class="p">)</span>
+    <span class="n">blackbox_fill</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mean</span><span class="p">)</span> <span class="o">*</span> <span class="mi">255</span><span class="p">)</span>
+
+    <span class="n">gen_slidingwindow</span> <span class="o">=</span> <span class="n">SlidingWindowStack</span><span class="p">((</span><span class="n">window_size</span><span class="p">,</span> <span class="n">window_size</span><span class="p">),</span> <span class="p">(</span><span class="n">stride</span><span class="p">,</span> <span class="n">stride</span><span class="p">),</span> <span class="n">threads</span><span class="o">=</span><span class="n">threads</span><span class="p">)</span>
+    <span class="n">gen_slidingwindow</span><span class="o">.</span><span class="n">fill</span> <span class="o">=</span> <span class="n">blackbox_fill</span>
+
+    <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path_to_img</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">extracted_concepts</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">extract_concepts_from_img</span><span class="p">(</span><span class="n">main_module</span><span class="p">,</span> <span class="n">mapping_module</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">transformation</span><span class="p">)</span>
+
+    <span class="n">app</span><span class="p">(</span>
+        <span class="n">path_to_img</span><span class="p">,</span>
+        <span class="n">blackbox_classifier</span><span class="p">,</span>
+        <span class="n">gen_slidingwindow</span><span class="p">,</span>
+        <span class="n">extracted_concepts</span><span class="p">,</span>
+        <span class="n">img_size</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">plt</span></div>
+
+
+<span class="k">def</span> <span class="nf">app</span><span class="p">(</span>
+        <span class="n">image_filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">blackbox_classify</span><span class="p">:</span> <span class="n">ClassifyImage</span><span class="p">,</span>
+        <span class="n">gen_bb_sal</span><span class="p">:</span> <span class="n">GenerateImageClassifierBlackboxSaliency</span><span class="p">,</span>
+        <span class="n">extracted_concepts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">img_size</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">):</span>
+    <span class="k">global</span> <span class="n">image_filename</span><span class="p">,</span> <span class="n">positive_classes_idx</span>
+    <span class="n">image_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">image_filepath</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">positive_classes_idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">extracted_concepts</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">s</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Not&#39;</span><span class="p">)]</span>
+
+    <span class="n">ref_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">PIL</span><span class="o">.</span><span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">image_filepath</span><span class="p">))</span>
+    <span class="n">ref_image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">ref_image</span><span class="p">,</span> <span class="p">(</span><span class="n">img_size</span><span class="p">,</span> <span class="n">img_size</span><span class="p">))</span>
+    <span class="n">sal_maps</span> <span class="o">=</span> <span class="n">gen_bb_sal</span><span class="p">(</span><span class="n">ref_image</span><span class="p">,</span> <span class="n">blackbox_classify</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saliency maps: </span><span class="si">{</span><span class="n">sal_maps</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">visualize_saliency</span><span class="p">(</span><span class="n">ref_image</span><span class="p">,</span> <span class="n">sal_maps</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="MultiLabelClassifier"><a class="viewcode-back" href="../../modules.html#revelionn.occlusion.MultiLabelClassifier">[docs]</a><span class="k">class</span> <span class="nc">MultiLabelClassifier</span><span class="p">(</span><span class="n">ClassifyImage</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">main_module</span><span class="p">,</span> <span class="n">mapping_module</span><span class="p">,</span> <span class="n">activation_extractor</span><span class="p">,</span> <span class="n">img_transformation</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_module</span> <span class="o">=</span> <span class="n">main_module</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mapping_module</span> <span class="o">=</span> <span class="n">mapping_module</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation_extractor</span> <span class="o">=</span> <span class="n">activation_extractor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img_transformation</span> <span class="o">=</span> <span class="n">img_transformation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">class_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapping_module</span><span class="o">.</span><span class="n">get_class_labels</span><span class="p">()</span>
+        <span class="k">global</span> <span class="n">class_labels</span>
+        <span class="n">class_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_labels</span>
+
+<div class="viewcode-block" id="MultiLabelClassifier.get_labels"><a class="viewcode-back" href="../../modules.html#revelionn.occlusion.MultiLabelClassifier.get_labels">[docs]</a>    <span class="k">def</span> <span class="nf">get_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">class_labels</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">positive_classes_idx</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="MultiLabelClassifier.classify_images"><a class="viewcode-back" href="../../modules.html#revelionn.occlusion.MultiLabelClassifier.classify_images">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">classify_images</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_iter</span><span class="p">):</span>
+        <span class="n">main_net</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_module</span><span class="o">.</span><span class="n">get_main_net</span><span class="p">()</span>
+        <span class="n">main_net</span> <span class="o">=</span> <span class="n">main_net</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+        <span class="n">mapping_net</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapping_module</span><span class="o">.</span><span class="n">get_mapping_net</span><span class="p">()</span>
+        <span class="n">mapping_net</span> <span class="o">=</span> <span class="n">mapping_net</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+            <span class="n">main_net</span> <span class="o">=</span> <span class="n">main_net</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+            <span class="n">mapping_net</span> <span class="o">=</span> <span class="n">mapping_net</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">image_iter</span><span class="p">:</span>
+            <span class="n">image_tensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_transformation</span><span class="p">(</span><span class="n">img</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+                <span class="n">image_tensor</span> <span class="o">=</span> <span class="n">image_tensor</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+            <span class="n">main_output</span> <span class="o">=</span> <span class="n">main_net</span><span class="p">(</span><span class="n">image_tensor</span><span class="p">)</span>
+            <span class="n">feature_vec</span> <span class="o">=</span> <span class="n">mapping_net</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">activation_extractor</span><span class="o">.</span><span class="n">get_activations</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mapping_net</span><span class="p">,</span> <span class="n">SimultaneousMappingNet</span><span class="p">):</span>
+                <span class="n">feature_vec</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">feature_vec</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">class_conf</span> <span class="o">=</span> <span class="n">feature_vec</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+                <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_labels</span><span class="p">(),</span> <span class="p">[</span><span class="n">class_conf</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">positive_classes_idx</span><span class="p">]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">class_conf</span> <span class="o">=</span> <span class="n">feature_vec</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">class_labels</span><span class="p">,</span> <span class="p">[</span><span class="n">class_conf</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="MultiLabelClassifier.get_config"><a class="viewcode-back" href="../../modules.html#revelionn.occlusion.MultiLabelClassifier.get_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Required by a parent class.</span>
+        <span class="k">return</span> <span class="p">{}</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">visualize_saliency</span><span class="p">(</span><span class="n">ref_image</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sal_maps</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="c1"># Visualize the saliency heat-maps</span>
+    <span class="n">sub_plot_ind</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sal_maps</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">sub_plot_ind</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ref_image</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">image_filename</span><span class="p">)</span>
+
+    <span class="n">colorbar_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;fraction&quot;</span><span class="p">:</span> <span class="mf">0.046</span> <span class="o">*</span> <span class="p">(</span><span class="n">ref_image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">ref_image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+        <span class="s2">&quot;pad&quot;</span><span class="p">:</span> <span class="mf">0.04</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="n">positive_class_labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">class_labels</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">positive_classes_idx</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">class_sal_map</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sal_maps</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Class </span><span class="si">{</span><span class="n">positive_class_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2"> saliency map range: [</span><span class="si">{</span><span class="n">class_sal_map</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">class_sal_map</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">sub_plot_ind</span><span class="p">,</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ref_image</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">class_sal_map</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;jet&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span>
+        <span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">clim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="o">**</span><span class="n">colorbar_kwargs</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">positive_class_labels</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RevelioNN authors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

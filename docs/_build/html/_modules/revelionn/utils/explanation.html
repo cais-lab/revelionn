@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>revelionn.utils.explanation &mdash; RevelioNN  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            RevelioNN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../scenarios.html">Usage Scenarios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_usage.html">Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">RevelioNN Modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">RevelioNN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">revelionn.utils.explanation</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for revelionn.utils.explanation</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="kn">from</span> <span class="nn">revelionn.mapping_nets.simultaneous_mapping_net</span> <span class="kn">import</span> <span class="n">SimultaneousMappingNet</span>
+
+
+<div class="viewcode-block" id="extract_concepts_from_img"><a class="viewcode-back" href="../../../modules.html#revelionn.utils.explanation.extract_concepts_from_img">[docs]</a><span class="k">def</span> <span class="nf">extract_concepts_from_img</span><span class="p">(</span><span class="n">main_module</span><span class="p">,</span> <span class="n">mapping_module</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">transformation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts a set of concepts present in a given image.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    main_module : MainModelProcessing</span>
+<span class="sd">        Class for training, evaluation and processing the main network model.</span>
+<span class="sd">    mapping_module : MappingModelProcessing</span>
+<span class="sd">        Class for training, evaluation and processing the mapping network model.</span>
+<span class="sd">    img : PIL.Image</span>
+<span class="sd">        Class that represents a PIL image.</span>
+<span class="sd">    transformation : torchvision.transforms</span>
+<span class="sd">        A transform to apply to the image.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    main_concept : list[str]</span>
+<span class="sd">        Target concept extracted by the convolutional network.</span>
+<span class="sd">    extracted_concepts : list[str]</span>
+<span class="sd">        Concepts relevant to the target concept, which are extracted by the mapping network.</span>
+<span class="sd">    mapping_probabilities : list[float]</span>
+<span class="sd">        The probabilities, obtained from the output of the sigmoid, of each of the extracted concepts relevant to the</span>
+<span class="sd">        target concept.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">device</span> <span class="o">=</span> <span class="n">main_module</span><span class="o">.</span><span class="n">get_device</span><span class="p">()</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">transformation</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+
+    <span class="n">main_net</span> <span class="o">=</span> <span class="n">main_module</span><span class="o">.</span><span class="n">get_main_net</span><span class="p">()</span>
+    <span class="n">mapping_net</span> <span class="o">=</span> <span class="n">mapping_module</span><span class="o">.</span><span class="n">get_mapping_net</span><span class="p">()</span>
+
+    <span class="n">main_concept</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">extracted_concepts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">mapping_probabilities</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="n">main_net</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="n">mapping_net</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+        <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">main_class_labels</span> <span class="o">=</span> <span class="n">main_module</span><span class="o">.</span><span class="n">get_class_labels</span><span class="p">()</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">main_net</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">output</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>
+            <span class="n">main_concept</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">main_class_labels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">main_concept</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">main_class_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">mapping_class_labels</span> <span class="o">=</span> <span class="n">mapping_module</span><span class="o">.</span><span class="n">get_class_labels</span><span class="p">()</span>
+        <span class="n">mapping_output</span> <span class="o">=</span> <span class="n">mapping_net</span><span class="p">(</span><span class="n">mapping_module</span><span class="o">.</span><span class="n">get_activation_extractor</span><span class="p">()</span><span class="o">.</span><span class="n">get_activations</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mapping_net</span><span class="p">,</span> <span class="n">SimultaneousMappingNet</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mapping_output</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">mapping_output</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>
+                    <span class="n">extracted_concepts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mapping_class_labels</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">mapping_probabilities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mapping_output</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">extracted_concepts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Not</span><span class="si">{</span><span class="n">mapping_class_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="n">mapping_probabilities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">mapping_output</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mapping_output</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>
+                <span class="n">extracted_concepts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mapping_class_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">mapping_probabilities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mapping_output</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">extracted_concepts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Not</span><span class="si">{</span><span class="n">mapping_class_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">mapping_probabilities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">mapping_output</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">main_concept</span><span class="p">,</span> <span class="n">extracted_concepts</span><span class="p">,</span> <span class="n">mapping_probabilities</span></div>
+
+
+<div class="viewcode-block" id="to_main_observation"><a class="viewcode-back" href="../../../modules.html#revelionn.utils.explanation.to_main_observation">[docs]</a><span class="k">def</span> <span class="nf">to_main_observation</span><span class="p">(</span><span class="n">concept</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Formats a string from the name of the target concept to be parsed by the justifier.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    concept : str</span>
+<span class="sd">        Name of the target concept.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        String from the name of the target concept to be parsed by the justifier.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;__input__ Type: </span><span class="si">{</span><span class="n">concept</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span></div>
+
+
+<div class="viewcode-block" id="to_mapping_observation"><a class="viewcode-back" href="../../../modules.html#revelionn.utils.explanation.to_mapping_observation">[docs]</a><span class="k">def</span> <span class="nf">to_mapping_observation</span><span class="p">(</span><span class="n">concept</span><span class="p">,</span> <span class="n">probability</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Formats a string from the name of the concept relevant to the target concept, which will be parsed by the justifier.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    concept : str</span>
+<span class="sd">        Name of the concept relevant to the target concept.</span>
+<span class="sd">    probability : float</span>
+<span class="sd">        The probability of the concept obtained at the output of the sigmoid.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        String from the name of the concept relevant to the target concept, which will be parsed by the justifier.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;__input__ Type: </span><span class="si">{</span><span class="n">concept</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">probability</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span></div>
+
+
+<div class="viewcode-block" id="explain_target_concept"><a class="viewcode-back" href="../../../modules.html#revelionn.utils.explanation.explain_target_concept">[docs]</a><span class="k">def</span> <span class="nf">explain_target_concept</span><span class="p">(</span><span class="n">extracted_concepts</span><span class="p">,</span> <span class="n">mapping_probabilities</span><span class="p">,</span> <span class="n">concepts_map</span><span class="p">,</span> <span class="n">target_concept</span><span class="p">,</span>
+                           <span class="n">jar_filepath</span><span class="p">,</span> <span class="n">ontology_filepath</span><span class="p">,</span> <span class="n">path_to_temp_files</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    extracted_concepts : list[str]</span>
+<span class="sd">        Concepts relevant to the target concept, which are extracted by the mapping network.</span>
+<span class="sd">    mapping_probabilities : list[float]</span>
+<span class="sd">        The probabilities, obtained from the output of the sigmoid, of each of the extracted concepts relevant to the</span>
+<span class="sd">        target concept.</span>
+<span class="sd">    concepts_map : dict</span>
+<span class="sd">        Dictionary whose keys are the names of the attributes of the dataset, and the values are the corresponding</span>
+<span class="sd">        concepts of the ontology.</span>
+<span class="sd">    target_concept : str</span>
+<span class="sd">        The concept of ontology, which should be obtained by ontological inference from the extracted concepts.</span>
+<span class="sd">    jar_filepath : str</span>
+<span class="sd">        Path to the script (file onto_justify.jar) that generates explanations based on the ontology.</span>
+<span class="sd">    ontology_filepath : str</span>
+<span class="sd">        Path to the OWL ontology file.</span>
+<span class="sd">    path_to_temp_files</span>
+<span class="sd">        Temporary files directory for storing observations and explanations.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    justifications : str</span>
+<span class="sd">        A set of obtained justifications of the target class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">observations_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_to_temp_files</span><span class="p">,</span> <span class="s1">&#39;observations.txt&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">observations_filepath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">observations_file</span><span class="p">:</span>
+        <span class="n">observations_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">to_main_observation</span><span class="p">(</span><span class="n">concepts_map</span><span class="p">[</span><span class="n">target_concept</span><span class="p">]))</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">extracted_concepts</span><span class="p">)):</span>
+            <span class="n">concept</span> <span class="o">=</span> <span class="n">extracted_concepts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">probability</span> <span class="o">=</span> <span class="n">mapping_probabilities</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">concept</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Not&#39;</span><span class="p">):</span>
+                <span class="n">concept</span> <span class="o">=</span> <span class="n">concept</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
+                <span class="n">observations_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">to_mapping_observation</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;not </span><span class="si">{</span><span class="n">concepts_map</span><span class="p">[</span><span class="n">concept</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">probability</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">observations_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">to_mapping_observation</span><span class="p">(</span><span class="n">concepts_map</span><span class="p">[</span><span class="n">concept</span><span class="p">],</span> <span class="n">probability</span><span class="p">))</span>
+
+        <span class="n">observations_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="n">justifications_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_to_temp_files</span><span class="p">,</span> <span class="s1">&#39;justifications.txt&#39;</span><span class="p">)</span>
+
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s2">&quot;java&quot;</span><span class="p">,</span> <span class="s2">&quot;-Dsun.stdout.encoding=UTF-8&quot;</span><span class="p">,</span> <span class="s2">&quot;-Dsun.err.encoding=UTF-8&quot;</span><span class="p">,</span> <span class="s2">&quot;-jar&quot;</span><span class="p">,</span>
+                     <span class="n">jar_filepath</span><span class="p">,</span> <span class="n">ontology_filepath</span><span class="p">,</span> <span class="n">observations_filepath</span><span class="p">,</span> <span class="n">justifications_filepath</span><span class="p">])</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">justifications_filepath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">justifications</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">justifications</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RevelioNN authors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

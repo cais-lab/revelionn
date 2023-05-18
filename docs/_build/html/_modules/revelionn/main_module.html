@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>revelionn.main_module &mdash; RevelioNN  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            RevelioNN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scenarios.html">Usage Scenarios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced_usage.html">Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">RevelioNN Modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">RevelioNN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">revelionn.main_module</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for revelionn.main_module</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">roc_auc_score</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">optim</span>
+
+<span class="kn">from</span> <span class="nn">.early_stopping</span> <span class="kn">import</span> <span class="n">EarlyStopping</span>
+
+
+<div class="viewcode-block" id="MainModelProcessing"><a class="viewcode-back" href="../../modules.html#revelionn.main_module.MainModelProcessing">[docs]</a><span class="k">class</span> <span class="nc">MainModelProcessing</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for training, evaluation and processing the main network model.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    device : torch.device</span>
+<span class="sd">        Tensor processing device.</span>
+<span class="sd">    main_net : torch.nn.Module</span>
+<span class="sd">        The model of the main neural network.</span>
+<span class="sd">    classes : dict</span>
+<span class="sd">        Names of neural network output classes.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    load_model(path_to_model_dict)</span>
+<span class="sd">        Loads the weights of the neural network model from a file.</span>
+<span class="sd">    train_model(patience, epochs, file_name, class_label_name, module_name,</span>
+<span class="sd">                main_net_class, transformation_name, img_size, num_channels)</span>
+<span class="sd">        Training and validation of the main neural network.</span>
+<span class="sd">    evaluate_model(test_loader)</span>
+<span class="sd">        Evaluation of the model on the test set.</span>
+<span class="sd">    get_main_net()</span>
+<span class="sd">        Returns the main neural network.</span>
+<span class="sd">    get_class_labels()</span>
+<span class="sd">        Returns names of neural network output classes.</span>
+<span class="sd">    get_device()</span>
+<span class="sd">        Returns the current tensor processing device.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">main_net</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets all the necessary attributes for the MainModelProcessing object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        main_net : torch.nn.Module</span>
+<span class="sd">            The model of the main neural network.</span>
+<span class="sd">        device : torch.device</span>
+<span class="sd">            Tensor processing device.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_net</span> <span class="o">=</span> <span class="n">main_net</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">classes</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="MainModelProcessing.get_main_net"><a class="viewcode-back" href="../../modules.html#revelionn.main_module.MainModelProcessing.get_main_net">[docs]</a>    <span class="k">def</span> <span class="nf">get_main_net</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the main neural network.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        main_net : MainNet(nn.Module)</span>
+<span class="sd">            The main neural network.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_net</span></div>
+
+<div class="viewcode-block" id="MainModelProcessing.get_class_labels"><a class="viewcode-back" href="../../modules.html#revelionn.main_module.MainModelProcessing.get_class_labels">[docs]</a>    <span class="k">def</span> <span class="nf">get_class_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns names of neural network output classes.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        classes : dict</span>
+<span class="sd">            Names of neural network output classes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes</span></div>
+
+<div class="viewcode-block" id="MainModelProcessing.get_device"><a class="viewcode-back" href="../../modules.html#revelionn.main_module.MainModelProcessing.get_device">[docs]</a>    <span class="k">def</span> <span class="nf">get_device</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the current tensor processing device.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        device : torch.device</span>
+<span class="sd">            Tensor processing device.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span></div>
+
+<div class="viewcode-block" id="MainModelProcessing.load_model"><a class="viewcode-back" href="../../modules.html#revelionn.main_module.MainModelProcessing.load_model">[docs]</a>    <span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path_to_model</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads the weights of the neural network model from a file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        path_to_model : str</span>
+<span class="sd">            The path to the file containing weights.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path_to_model</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_net</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">[</span><span class="s1">&#39;model_state_dict&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">classes</span> <span class="o">=</span> <span class="n">checkpoint</span><span class="p">[</span><span class="s1">&#39;classes&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="MainModelProcessing.train_model"><a class="viewcode-back" href="../../modules.html#revelionn.main_module.MainModelProcessing.train_model">[docs]</a>    <span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">valid_loader</span><span class="p">,</span> <span class="n">patience</span><span class="p">,</span> <span class="n">epochs</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">class_label</span><span class="p">,</span>
+                    <span class="n">module_name</span><span class="p">,</span> <span class="n">main_net_class</span><span class="p">,</span> <span class="n">transformation_name</span><span class="p">,</span> <span class="n">img_size</span><span class="p">,</span> <span class="n">num_channels</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Training and validation of the main neural network.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        patience : int</span>
+<span class="sd">            How many epochs to wait after last time validation loss improved.</span>
+<span class="sd">        epochs : int</span>
+<span class="sd">            The number of training epochs of the main neural network.</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            The name of the file in which the parameters of the trained model will be saved.</span>
+<span class="sd">        class_label : str</span>
+<span class="sd">            The name of the label of the class used for training.</span>
+<span class="sd">        module_name : str</span>
+<span class="sd">            The name of the file containing the main network class.</span>
+<span class="sd">        main_net_class : str</span>
+<span class="sd">            Name of the main network class.</span>
+<span class="sd">        transformation_name : str</span>
+<span class="sd">            Name of the variable storing transformations.</span>
+<span class="sd">        img_size : int</span>
+<span class="sd">            The size of the image side.</span>
+<span class="sd">        num_channels : int</span>
+<span class="sd">            The number of image channels.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_net</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BCELoss</span><span class="p">()</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main_net</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+
+        <span class="n">early_stopping</span> <span class="o">=</span> <span class="n">EarlyStopping</span><span class="p">(</span><span class="n">patience</span><span class="o">=</span><span class="n">patience</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
+            <span class="n">num_train_batches_without_auc</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">num_valid_batches_without_auc</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">train_loss</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">train_acc</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">train_auc</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">main_net</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="ow">in</span> <span class="n">train_loader</span><span class="p">:</span>
+                <span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+                <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+                <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_net</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+                <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+                <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+                <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+                <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+                <span class="n">train_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+                <span class="n">predictions</span> <span class="o">=</span> <span class="p">(</span><span class="n">logits</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
+                <span class="n">train_acc</span> <span class="o">+=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span> <span class="n">predictions</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">auc</span> <span class="o">=</span> <span class="n">roc_auc_score</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span> <span class="n">logits</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+                    <span class="n">train_auc</span> <span class="o">+=</span> <span class="n">auc</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="n">num_train_batches_without_auc</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="n">valid_loss</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">valid_acc</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">valid_auc</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">main_net</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+            <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="ow">in</span> <span class="n">valid_loader</span><span class="p">:</span>
+                    <span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+                    <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_net</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+                    <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+                    <span class="n">batch_loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+                    <span class="n">valid_loss</span> <span class="o">+=</span> <span class="n">batch_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+                    <span class="n">predictions</span> <span class="o">=</span> <span class="p">(</span><span class="n">logits</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
+                    <span class="n">valid_acc</span> <span class="o">+=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span> <span class="n">predictions</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">auc</span> <span class="o">=</span> <span class="n">roc_auc_score</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span> <span class="n">logits</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+                        <span class="n">valid_auc</span> <span class="o">+=</span> <span class="n">auc</span>
+                    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                        <span class="n">num_valid_batches_without_auc</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="n">result</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">e</span> <span class="o">+</span> <span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">epochs</span><span class="si">}</span><span class="s2">.. &quot;</span> \
+                     <span class="sa">f</span><span class="s2">&quot;Train loss: </span><span class="si">{</span><span class="n">train_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_loader</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">.. &quot;</span> \
+                     <span class="sa">f</span><span class="s2">&quot;Valid loss: </span><span class="si">{</span><span class="n">valid_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_loader</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">.. &quot;</span> \
+                     <span class="sa">f</span><span class="s2">&quot;Train acc: </span><span class="si">{</span><span class="n">train_acc</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_loader</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">.. &quot;</span> \
+                     <span class="sa">f</span><span class="s2">&quot;Valid acc: </span><span class="si">{</span><span class="n">valid_acc</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_loader</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">.. &quot;</span> \
+                     <span class="sa">f</span><span class="s2">&quot;Train AUC: </span><span class="si">{</span><span class="n">train_auc</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">train_loader</span><span class="p">)</span> <span class="o">-</span> <span class="n">num_train_batches_without_auc</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">.. &quot;</span> \
+                     <span class="sa">f</span><span class="s2">&quot;Valid AUC: </span><span class="si">{</span><span class="n">valid_auc</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">valid_loader</span><span class="p">)</span> <span class="o">-</span> <span class="n">num_valid_batches_without_auc</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">.. &quot;</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">.txt&#39;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+                <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">result</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="n">valid_loss_decrease</span> <span class="o">=</span> <span class="n">early_stopping</span><span class="p">(</span><span class="n">valid_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_loader</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">early_stopping</span><span class="o">.</span><span class="n">early_stop</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Early stopping&quot;</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="k">elif</span> <span class="n">valid_loss_decrease</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">.txt&#39;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+                    <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">valid_loss_decrease</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+                <span class="n">classes</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="n">class_label</span><span class="p">,</span>
+                           <span class="mi">0</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;Not</span><span class="si">{</span><span class="n">class_label</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">}</span>
+
+                <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">({</span><span class="s1">&#39;classes&#39;</span><span class="p">:</span> <span class="n">classes</span><span class="p">,</span>
+                            <span class="s1">&#39;model_state_dict&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_net</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
+                            <span class="s1">&#39;main_net_module_name&#39;</span><span class="p">:</span> <span class="n">module_name</span><span class="p">,</span>
+                            <span class="s1">&#39;main_net_class&#39;</span><span class="p">:</span> <span class="n">main_net_class</span><span class="p">,</span>
+                            <span class="s1">&#39;transformation_name&#39;</span><span class="p">:</span> <span class="n">transformation_name</span><span class="p">,</span>
+                            <span class="s1">&#39;img_size&#39;</span><span class="p">:</span> <span class="n">img_size</span><span class="p">,</span>
+                            <span class="s1">&#39;num_channels&#39;</span><span class="p">:</span> <span class="n">num_channels</span>
+                            <span class="p">},</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">.rvl&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MainModelProcessing.evaluate_model"><a class="viewcode-back" href="../../modules.html#revelionn.main_module.MainModelProcessing.evaluate_model">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_loader</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluation of the model on the test set.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        test_loader : torch.utils.data.DataLoader</span>
+<span class="sd">            Training data loader. Combines a dataset and a sampler, and provides an iterable over the given dataset.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        test_loss : float</span>
+<span class="sd">            Test loss.</span>
+<span class="sd">        test_acc : float</span>
+<span class="sd">            Accuracy on the test set.</span>
+<span class="sd">        test_auc : float</span>
+<span class="sd">            ROC AUC on the test set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BCELoss</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_net</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+        <span class="n">num_test_batches_without_auc</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">test_loss</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">test_acc</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">test_auc</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="ow">in</span> <span class="n">test_loader</span><span class="p">:</span>
+                <span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+                <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_net</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+                <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+
+                <span class="n">batch_loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+                <span class="n">test_loss</span> <span class="o">+=</span> <span class="n">batch_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+                <span class="n">predictions</span> <span class="o">=</span> <span class="p">(</span><span class="n">logits</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
+                <span class="n">test_acc</span> <span class="o">+=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span> <span class="n">predictions</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">auc</span> <span class="o">=</span> <span class="n">roc_auc_score</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span> <span class="n">logits</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+                    <span class="n">test_auc</span> <span class="o">+=</span> <span class="n">auc</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="n">num_test_batches_without_auc</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">test_loss</span> <span class="o">=</span> <span class="n">test_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_loader</span><span class="p">)</span>
+        <span class="n">test_acc</span> <span class="o">=</span> <span class="n">test_acc</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_loader</span><span class="p">)</span>
+        <span class="n">test_auc</span> <span class="o">=</span> <span class="n">test_auc</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">test_loader</span><span class="p">)</span> <span class="o">-</span> <span class="n">num_test_batches_without_auc</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Test loss: </span><span class="si">{</span><span class="n">test_loss</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">.. &quot;</span>
+              <span class="sa">f</span><span class="s2">&quot;Test acc: </span><span class="si">{</span><span class="n">test_acc</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">.. &quot;</span>
+              <span class="sa">f</span><span class="s2">&quot;Test AUC: </span><span class="si">{</span><span class="n">test_auc</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">.. &quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">test_loss</span><span class="p">,</span> <span class="n">test_acc</span><span class="p">,</span> <span class="n">test_auc</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RevelioNN authors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

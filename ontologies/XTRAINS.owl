@@ -1,0 +1,1257 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#"
+     xml:base="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:NeuroSymTrainOntology="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#">
+    <owl:Ontology rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology">
+        <owl:versionIRI rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology/1.3.0"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#carries -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#carries">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Wagon"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Content"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#has -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#has">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Train"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Locomotive"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Wagon"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#content_shape -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#content_shape">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Content"/>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:oneOf>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                        <rdf:first>circle</rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                <rdf:first>diamond</rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                        <rdf:first>hexagon</rdf:first>
+                                        <rdf:rest>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                <rdf:first>inv_triangle</rdf:first>
+                                                <rdf:rest>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                        <rdf:first>m_square</rdf:first>
+                                                        <rdf:rest>
+                                                            <rdf:Description>
+                                                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                                <rdf:first>rectangle</rdf:first>
+                                                                <rdf:rest>
+                                                                    <rdf:Description>
+                                                                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                                        <rdf:first>s_square</rdf:first>
+                                                                        <rdf:rest>
+                                                                            <rdf:Description>
+                                                                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                                                <rdf:first>triangle</rdf:first>
+                                                                                <rdf:rest>
+                                                                                    <rdf:Description>
+                                                                                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                                                        <rdf:first>xl_square</rdf:first>
+                                                                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                                                    </rdf:Description>
+                                                                                </rdf:rest>
+                                                                            </rdf:Description>
+                                                                        </rdf:rest>
+                                                                    </rdf:Description>
+                                                                </rdf:rest>
+                                                            </rdf:Description>
+                                                        </rdf:rest>
+                                                    </rdf:Description>
+                                                </rdf:rest>
+                                            </rdf:Description>
+                                        </rdf:rest>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </owl:oneOf>
+            </rdfs:Datatype>
+        </rdfs:range>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#quantity -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#quantity">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Content"/>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:oneOf>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                        <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                        <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3</rdf:first>
+                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </owl:oneOf>
+            </rdfs:Datatype>
+        </rdfs:range>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#roof -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#roof">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Wagon"/>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:oneOf>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                        <rdf:first>ellipse</rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                <rdf:first>flat</rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                        <rdf:first>open</rdf:first>
+                                        <rdf:rest>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                <rdf:first>saw</rdf:first>
+                                                <rdf:rest>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                        <rdf:first>triangular</rdf:first>
+                                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                    </rdf:Description>
+                                                </rdf:rest>
+                                            </rdf:Description>
+                                        </rdf:rest>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </owl:oneOf>
+            </rdfs:Datatype>
+        </rdfs:range>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#size -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#size">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Content"/>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:oneOf>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                        <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                        <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3</rdf:first>
+                                        <rdf:rest>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4</rdf:first>
+                                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                            </rdf:Description>
+                                        </rdf:rest>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </owl:oneOf>
+            </rdfs:Datatype>
+        </rdfs:range>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#wagon_length -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#wagon_length">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Wagon"/>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:oneOf>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                        <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</rdf:first>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </owl:oneOf>
+            </rdfs:Datatype>
+        </rdfs:range>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#wagon_shape -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#wagon_shape">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Wagon"/>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:oneOf>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                        <rdf:first>box</rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                <rdf:first>ellipse</rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                        <rdf:first>hexagon</rdf:first>
+                                        <rdf:rest>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                <rdf:first>reinforced</rdf:first>
+                                                <rdf:rest>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                        <rdf:first>superellipse</rdf:first>
+                                                        <rdf:rest>
+                                                            <rdf:Description>
+                                                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                                <rdf:first>trapezoid</rdf:first>
+                                                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                            </rdf:Description>
+                                                        </rdf:rest>
+                                                    </rdf:Description>
+                                                </rdf:rest>
+                                            </rdf:Description>
+                                        </rdf:rest>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </owl:oneOf>
+            </rdfs:Datatype>
+        </rdfs:range>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#wheel_num -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#wheel_num">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Wagon"/>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:oneOf>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                        <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4</rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                        <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">6</rdf:first>
+                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </owl:oneOf>
+            </rdfs:Datatype>
+        </rdfs:range>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#wheel_size -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#wheel_size">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Train"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Content -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Content">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#content_shape"/>
+                <owl:minCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:minCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#quantity"/>
+                <owl:minCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:minCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#size"/>
+                <owl:minCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:minCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#content_shape"/>
+                <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:maxCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#quantity"/>
+                <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:maxCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#size"/>
+                <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:maxCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Locomotive"/>
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Train"/>
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Wagon"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#CosyWagon -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#CosyWagon">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Wagon"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#EmptyTrain -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#EmptyTrain">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Train"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#has"/>
+                        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#EmptyWagon"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#has"/>
+                        <owl:allValuesFrom>
+                            <owl:Class>
+                                <owl:unionOf rdf:parseType="Collection">
+                                    <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#EmptyWagon"/>
+                                    <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Locomotive"/>
+                                </owl:unionOf>
+                            </owl:Class>
+                        </owl:allValuesFrom>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#EmptyWagon -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#EmptyWagon">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Wagon"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#carries"/>
+                        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">0</owl:maxCardinality>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#FreightTrain -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#FreightTrain">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Train"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#FreightWagon -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#FreightWagon">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Wagon"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#carries"/>
+                        <owl:someValuesFrom>
+                            <owl:Class>
+                                <owl:intersectionOf rdf:parseType="Collection">
+                                    <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Content"/>
+                                    <owl:Class>
+                                        <owl:complementOf>
+                                            <owl:Restriction>
+                                                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#content_shape"/>
+                                                <owl:hasValue>circle</owl:hasValue>
+                                            </owl:Restriction>
+                                        </owl:complementOf>
+                                    </owl:Class>
+                                </owl:intersectionOf>
+                            </owl:Class>
+                        </owl:someValuesFrom>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#LargeWheelTrain -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#LargeWheelTrain">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Train"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Locomotive -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Locomotive">
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Train"/>
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Wagon"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#LongFreightTrain -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#LongFreightTrain">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#FreightTrain"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#LongTrain"/>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#LongPassengerTrain -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#LongPassengerTrain">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#LongTrain"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#PassengerTrain"/>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#LongTrain -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#LongTrain">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Train"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#LongWagon -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#LongWagon">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Wagon"/>
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#ShortWagon"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#MixedTrain -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#MixedTrain">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Train"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#OpenRoofCar -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#OpenRoofCar">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Wagon"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#roof"/>
+                        <owl:hasValue>open</owl:hasValue>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#PassengerCar -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#PassengerCar">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Wagon"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#carries"/>
+                        <owl:someValuesFrom>
+                            <owl:Class>
+                                <owl:intersectionOf rdf:parseType="Collection">
+                                    <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Content"/>
+                                    <owl:Restriction>
+                                        <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#content_shape"/>
+                                        <owl:hasValue>circle</owl:hasValue>
+                                    </owl:Restriction>
+                                </owl:intersectionOf>
+                            </owl:Class>
+                        </owl:someValuesFrom>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#PassengerTrain -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#PassengerTrain">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Train"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#ReinforcedCar -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#ReinforcedCar">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Wagon"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#wagon_shape"/>
+                        <owl:hasValue>reinforced</owl:hasValue>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#RuralTrain -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#RuralTrain">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Train"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#ShortWagon -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#ShortWagon">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Wagon"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Train -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Train">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#has"/>
+                <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:minQualifiedCardinality>
+                <owl:onClass rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Locomotive"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#has"/>
+                <owl:maxQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onClass rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Locomotive"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#has"/>
+                <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">5</owl:maxCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#wheel_size"/>
+                <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:minQualifiedCardinality>
+                <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#wheel_size"/>
+                <owl:maxQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Wagon"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#TypeA -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#TypeA">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#EmptyTrain"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#WarTrain"/>
+                </owl:unionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#TypeB -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#TypeB">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#LongFreightTrain"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#PassengerTrain"/>
+                </owl:unionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#TypeC -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#TypeC">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#MixedTrain"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#RuralTrain"/>
+                </owl:unionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#TypeD -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#TypeD">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#has"/>
+                        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#CosyWagon"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#has"/>
+                        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#PassengerCar"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Wagon -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Wagon">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#carries"/>
+                <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:maxCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#roof"/>
+                <owl:minCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:minCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#wagon_length"/>
+                <owl:minCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:minCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#wagon_shape"/>
+                <owl:minCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:minCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#wheel_num"/>
+                <owl:minCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:minCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#roof"/>
+                <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:maxCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#wagon_length"/>
+                <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:maxCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#wagon_shape"/>
+                <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:maxCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#wheel_num"/>
+                <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:maxCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#WarTrain -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#WarTrain">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Train"/>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#__input__ -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#__input__"/>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#t -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#t">
+        <rdf:type>
+            <owl:Class>
+                <owl:complementOf>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#has"/>
+                        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#LongWagon"/>
+                    </owl:Restriction>
+                </owl:complementOf>
+            </owl:Class>
+        </rdf:type>
+        <rdf:type>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#has"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#EmptyWagon"/>
+            </owl:Restriction>
+        </rdf:type>
+        <rdf:type>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#has"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#FreightWagon"/>
+            </owl:Restriction>
+        </rdf:type>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w1">
+        <rdf:type rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Wagon"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w2 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w2">
+        <rdf:type rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Wagon"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w3 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w3">
+        <rdf:type rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Wagon"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_EmptyWagon1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_EmptyWagon1">
+        <rdf:type rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#EmptyWagon"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_EmptyWagon2 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_EmptyWagon2">
+        <rdf:type rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#EmptyWagon"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_EmptyWagon3 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_EmptyWagon3">
+        <rdf:type rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#EmptyWagon"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_FreightWagon -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_FreightWagon">
+        <rdf:type rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#FreightWagon"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_LongWagon1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_LongWagon1">
+        <rdf:type rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#LongWagon"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_LongWagon2 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_LongWagon2">
+        <rdf:type rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#LongWagon"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_LongWagon3 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_LongWagon3">
+        <rdf:type rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#LongWagon"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_LongWagon4 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_LongWagon4">
+        <rdf:type rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#LongWagon"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_PassengerCar -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_PassengerCar">
+        <rdf:type rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#PassengerCar"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_ReinforcedCar -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_ReinforcedCar">
+        <rdf:type rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#ReinforcedCar"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // General axioms
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <owl:Restriction>
+        <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#roof"/>
+        <owl:someValuesFrom>
+            <rdfs:Datatype>
+                <owl:oneOf>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                        <rdf:first>ellipse</rdf:first>
+                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                    </rdf:Description>
+                </owl:oneOf>
+            </rdfs:Datatype>
+        </owl:someValuesFrom>
+        <owl:equivalentClass>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#wagon_shape"/>
+                <owl:someValuesFrom>
+                    <rdfs:Datatype>
+                        <owl:oneOf>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                <rdf:first>ellipse</rdf:first>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                            </rdf:Description>
+                        </owl:oneOf>
+                    </rdfs:Datatype>
+                </owl:someValuesFrom>
+            </owl:Restriction>
+        </owl:equivalentClass>
+    </owl:Restriction>
+    <owl:Restriction>
+        <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#roof"/>
+        <owl:someValuesFrom>
+            <rdfs:Datatype>
+                <owl:oneOf>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                        <rdf:first>flat</rdf:first>
+                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                    </rdf:Description>
+                </owl:oneOf>
+            </rdfs:Datatype>
+        </owl:someValuesFrom>
+        <owl:equivalentClass>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#wagon_shape"/>
+                <owl:someValuesFrom>
+                    <rdfs:Datatype>
+                        <owl:oneOf>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                <rdf:first>hexagon</rdf:first>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                            </rdf:Description>
+                        </owl:oneOf>
+                    </rdfs:Datatype>
+                </owl:someValuesFrom>
+            </owl:Restriction>
+        </owl:equivalentClass>
+    </owl:Restriction>
+    <owl:Class>
+        <owl:intersectionOf rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#ShortWagon"/>
+            <owl:Class>
+                <owl:complementOf rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#FreightWagon"/>
+            </owl:Class>
+            <owl:Class>
+                <owl:complementOf rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#OpenRoofCar"/>
+            </owl:Class>
+        </owl:intersectionOf>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#CosyWagon"/>
+    </owl:Class>
+    <owl:Class>
+        <owl:intersectionOf rdf:parseType="Collection">
+            <owl:Class>
+                <owl:complementOf>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#has"/>
+                        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#LongWagon"/>
+                    </owl:Restriction>
+                </owl:complementOf>
+            </owl:Class>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#has"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#EmptyWagon"/>
+            </owl:Restriction>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#has"/>
+                <owl:someValuesFrom>
+                    <owl:Class>
+                        <owl:unionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#FreightWagon"/>
+                            <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#PassengerCar"/>
+                        </owl:unionOf>
+                    </owl:Class>
+                </owl:someValuesFrom>
+            </owl:Restriction>
+        </owl:intersectionOf>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#RuralTrain"/>
+    </owl:Class>
+    <owl:Class>
+        <owl:intersectionOf rdf:parseType="Collection">
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#has"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#EmptyWagon"/>
+            </owl:Restriction>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#has"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#FreightWagon"/>
+            </owl:Restriction>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#has"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#PassengerCar"/>
+            </owl:Restriction>
+        </owl:intersectionOf>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#MixedTrain"/>
+    </owl:Class>
+    <owl:Class>
+        <owl:intersectionOf rdf:parseType="Collection">
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#has"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#PassengerCar"/>
+            </owl:Restriction>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#has"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#ReinforcedCar"/>
+            </owl:Restriction>
+        </owl:intersectionOf>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#WarTrain"/>
+    </owl:Class>
+    <owl:Class>
+        <owl:unionOf rdf:parseType="Collection">
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#has"/>
+                <owl:someValuesFrom>
+                    <owl:Class>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#LongWagon"/>
+                            <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#PassengerCar"/>
+                        </owl:intersectionOf>
+                    </owl:Class>
+                </owl:someValuesFrom>
+            </owl:Restriction>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#has"/>
+                <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">2</owl:minQualifiedCardinality>
+                <owl:onClass rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#PassengerCar"/>
+            </owl:Restriction>
+        </owl:unionOf>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#PassengerTrain"/>
+    </owl:Class>
+    <owl:Class>
+        <owl:unionOf rdf:parseType="Collection">
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#has"/>
+                <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">2</owl:minQualifiedCardinality>
+                <owl:onClass rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#LongWagon"/>
+            </owl:Restriction>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#has"/>
+                <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">3</owl:minQualifiedCardinality>
+                <owl:onClass rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#Wagon"/>
+            </owl:Restriction>
+        </owl:unionOf>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#LongTrain"/>
+    </owl:Class>
+    <owl:Restriction>
+        <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#has"/>
+        <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">2</owl:minQualifiedCardinality>
+        <owl:onClass rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#FreightWagon"/>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#FreightTrain"/>
+    </owl:Restriction>
+    <owl:Restriction>
+        <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#wagon_length"/>
+        <owl:hasValue rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</owl:hasValue>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#ShortWagon"/>
+    </owl:Restriction>
+    <owl:Restriction>
+        <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#wagon_length"/>
+        <owl:hasValue rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</owl:hasValue>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#LongWagon"/>
+    </owl:Restriction>
+    <owl:Restriction>
+        <owl:onProperty rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#wheel_size"/>
+        <owl:hasValue rdf:datatype="http://www.w3.org/2001/XMLSchema#int">3</owl:hasValue>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#LargeWheelTrain"/>
+    </owl:Restriction>
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_EmptyWagon1"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_EmptyWagon2"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_EmptyWagon1"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_EmptyWagon3"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_EmptyWagon2"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_EmptyWagon3"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_LongWagon1"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_LongWagon2"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_LongWagon1"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_LongWagon3"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_LongWagon1"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_LongWagon4"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_LongWagon2"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_LongWagon3"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_LongWagon2"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_LongWagon4"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_LongWagon3"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/msr/ontologies/2020/4/NeuroSymTrainOntology#w_LongWagon4"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.2.8.20170104-2310) https://github.com/owlcs/owlapi -->
+

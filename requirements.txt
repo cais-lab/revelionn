@@ -1,0 +1,20 @@
+python<3.10
+pandas==1.5.2
+chardet==5.1.0
+coverage==7.2.5
+matplotlib==3.7.1
+networkx==3.1
+numpy==1.24.2
+nxontology==0.5.0
+opencv-python==4.7.0.72
+Pillow==9.4.0
+pytest==7.3.1
+pytest-cov==4.0.0
+scikit-learn==0.24.2
+semantic-loss-pytorch @ git+https://github.com/lucadiliello/semantic-loss-pytorch.git@cbe79bc8d4cd9cd088b35db880edafa3fbc65d66
+Sphinx==6.2.1
+sphinx-rtd-theme==1.2.0
+torch==2.0.0
+torchaudio==2.0.0
+torchvision==0.15.0
+xaitk-saliency==0.6.1

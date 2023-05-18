@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>revelionn.activation_extraction &mdash; RevelioNN  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            RevelioNN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scenarios.html">Usage Scenarios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced_usage.html">Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">RevelioNN Modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">RevelioNN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">revelionn.activation_extraction</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for revelionn.activation_extraction</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="kn">from</span> <span class="nn">.main_module</span> <span class="kn">import</span> <span class="n">MainModelProcessing</span>
+
+
+<div class="viewcode-block" id="ActivationExtractor"><a class="viewcode-back" href="../../modules.html#revelionn.activation_extraction.ActivationExtractor">[docs]</a><span class="k">class</span> <span class="nc">ActivationExtractor</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for identifying layers of a convolutional neural network and for extracting activations produced during</span>
+<span class="sd">    network inference from a selected set of layers.</span>
+
+<span class="sd">    It has two modes of operation:</span>
+<span class="sd">    1. Activations of the given layers are concatenated and transformed to a one-dimensional tensor.</span>
+<span class="sd">    It is used to train a single mapping network.</span>
+<span class="sd">    2. Activations of the specified layers are returned as a tuple without transformations.</span>
+<span class="sd">    It is used for training simultaneous mapping network.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    device : torch.device</span>
+<span class="sd">        Tensor processing device.</span>
+<span class="sd">    main_net : torch.nn.Module</span>
+<span class="sd">        The model of the main neural network.</span>
+<span class="sd">    layers_types_dict : dict</span>
+<span class="sd">        The dictionary contains the names of layer types as keys, and the corresponding values represent</span>
+<span class="sd">        the layer class in PyTorch.</span>
+<span class="sd">    layers_types : list</span>
+<span class="sd">        Types of layers to be found in the hierarchy of network layers. This list should contain only the names of the</span>
+<span class="sd">        layer types that are in &#39;layers_types_dict&#39; dictionary.</span>
+<span class="sd">    layers_dict : dict</span>
+<span class="sd">        Dictionary of neural network layers. The keys of this dictionary represent the unique names of each of the</span>
+<span class="sd">        layers of the convolutional network.</span>
+<span class="sd">    activation : dict</span>
+<span class="sd">        Activation values of the specified layers.</span>
+<span class="sd">    layers_for_research : list</span>
+<span class="sd">        A list of the studied convolutional network layers. Set by the user with keys in the &#39;layers_dict&#39; dictionary.</span>
+<span class="sd">    is_concatenate : bool</span>
+<span class="sd">        Logical parameter that sets the mode of operation of ActivationExtractor. If True, the activations of the given</span>
+<span class="sd">        layers are concatenated and transformed to a one-dimensional tensor. If False, the activations of the specified</span>
+<span class="sd">        layers are returned as a tuple without transformations.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    get_layers_types()</span>
+<span class="sd">        Returns user-defined types of layers to be found in the hierarchy of network layers.</span>
+<span class="sd">    find_layer_predicate_recursive(model, predicate)</span>
+<span class="sd">        Recursively searches through a PyTorch model and returns a list of all layers that satisfy a given predicate.</span>
+<span class="sd">    find_layers_types_recursive(model, layers_types)</span>
+<span class="sd">        Recursively searches through a PyTorch model and returns a list of all layers that are of a given type or types.</span>
+<span class="sd">    create_layers_dict(model, cur_layers_types)</span>
+<span class="sd">        Creates a dictionary of PyTorch layers of the given types from a PyTorch model.</span>
+<span class="sd">    get_layers_dict()</span>
+<span class="sd">        Returns a dictionary of neural network layers.</span>
+<span class="sd">    get_layer_name_by_number(number)</span>
+<span class="sd">        Returns the layer name in the layers dictionary by its number.</span>
+<span class="sd">    get_activation(name)</span>
+<span class="sd">        Saves the values of layer activations.</span>
+<span class="sd">    register_hooks()</span>
+<span class="sd">        Registers the interception of activations of the studied layers.</span>
+<span class="sd">    count_num_activations(num_channels, width_img, height_img)</span>
+<span class="sd">        Returns the number of activations of neurons of the studied layers.</span>
+<span class="sd">    get_activations(mapping_batch_size)</span>
+<span class="sd">        Returns the activation tensor of the studied layers.</span>
+<span class="sd">    set_layers_for_research(layers)</span>
+<span class="sd">        Sets the list of layers to be examined.</span>
+<span class="sd">    get_layers_for_research()</span>
+<span class="sd">        Returns a list of the layers under study.</span>
+<span class="sd">    get_main_net()</span>
+<span class="sd">        Returns the main neural network.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">main_module</span><span class="p">,</span> <span class="n">layers_types</span><span class="p">,</span> <span class="n">is_concatenate</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets all the necessary attributes for the MainNetExplanation object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        main_module : MainModelProcessing</span>
+<span class="sd">            The model of the main neural network.</span>
+<span class="sd">        layers_types : list</span>
+<span class="sd">            Types of layers to be found in the hierarchy of network layers.</span>
+<span class="sd">        is_concatenate : bool</span>
+<span class="sd">            Logical parameter that sets the mode of operation of ActivationExtractor. If True, the activations of the</span>
+<span class="sd">            given layers are concatenated and transformed to a one-dimensional tensor. If False, the activations of the</span>
+<span class="sd">            specified layers are returned as a tuple without transformations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">main_module</span><span class="o">.</span><span class="n">get_device</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_net</span> <span class="o">=</span> <span class="n">main_module</span><span class="o">.</span><span class="n">get_main_net</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers_types</span> <span class="o">=</span> <span class="n">layers_types</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers_types_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;bn&#39;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">,</span>
+                                  <span class="s1">&#39;conv&#39;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">,</span>
+                                  <span class="s1">&#39;fc&#39;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_layers_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main_net</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers_types</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_concatenate</span> <span class="o">=</span> <span class="n">is_concatenate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers_for_research</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="ActivationExtractor.get_layers_types"><a class="viewcode-back" href="../../modules.html#revelionn.activation_extraction.ActivationExtractor.get_layers_types">[docs]</a>    <span class="k">def</span> <span class="nf">get_layers_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns user-defined types of layers to be found in the hierarchy of network layers.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list[str]</span>
+<span class="sd">            Layers types.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers_types</span></div>
+
+<div class="viewcode-block" id="ActivationExtractor.find_layer_predicate_recursive"><a class="viewcode-back" href="../../modules.html#revelionn.activation_extraction.ActivationExtractor.find_layer_predicate_recursive">[docs]</a>    <span class="k">def</span> <span class="nf">find_layer_predicate_recursive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">predicate</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recursively searches through a PyTorch model and returns a list of all layers that satisfy a given predicate.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model : torch.nn.Module</span>
+<span class="sd">            The PyTorch model to search through.</span>
+<span class="sd">        predicate : function</span>
+<span class="sd">            A function that takes a PyTorch layer as input and returns a boolean indicating whether or not the layer</span>
+<span class="sd">            satisfies the predicate.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A list of all layers in the model that satisfy the given predicate.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">layers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">_modules</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">predicate</span><span class="p">(</span><span class="n">layer</span><span class="p">):</span>
+                <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+            <span class="n">layers</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">find_layer_predicate_recursive</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">predicate</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">layers</span></div>
+
+<div class="viewcode-block" id="ActivationExtractor.find_layers_types_recursive"><a class="viewcode-back" href="../../modules.html#revelionn.activation_extraction.ActivationExtractor.find_layers_types_recursive">[docs]</a>    <span class="k">def</span> <span class="nf">find_layers_types_recursive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">layers_types</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recursively searches through a PyTorch model and returns a list of all layers that are of a given type or types.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model : torch.nn.Module</span>
+<span class="sd">            The PyTorch model to search through.</span>
+<span class="sd">        layers_types : list</span>
+<span class="sd">            A list of PyTorch layer types to search for.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A list of all layers in the model that are of one of the given layer types.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">predicate</span><span class="p">(</span><span class="n">layer</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span> <span class="ow">in</span> <span class="n">layers_types</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_layer_predicate_recursive</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">predicate</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ActivationExtractor.create_layers_dict"><a class="viewcode-back" href="../../modules.html#revelionn.activation_extraction.ActivationExtractor.create_layers_dict">[docs]</a>    <span class="k">def</span> <span class="nf">create_layers_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">cur_layers_types</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a dictionary of PyTorch layers of the given types from a PyTorch model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model : torch.nn.Module</span>
+<span class="sd">            The PyTorch model to extract layers from.</span>
+<span class="sd">        cur_layers_types : list</span>
+<span class="sd">            A list of strings representing the types of layers to extract.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            A dictionary mapping layer names to PyTorch layers of the corresponding type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">cur_layers_types_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">cur_layer_type</span> <span class="ow">in</span> <span class="n">cur_layers_types</span><span class="p">:</span>
+            <span class="n">cur_layers_types_dict</span><span class="p">[</span><span class="n">cur_layer_type</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers_types_dict</span><span class="p">[</span><span class="n">cur_layer_type</span><span class="p">]</span>
+
+        <span class="n">layers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_layers_types_recursive</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">cur_layers_types_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+        <span class="n">layer_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">layers</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">layer_type</span> <span class="ow">in</span> <span class="n">cur_layers_types_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">layer_type</span><span class="p">):</span>
+                    <span class="n">layer_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}{</span><span class="n">count</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">layers_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">layer_names</span><span class="p">,</span> <span class="n">layers</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">layers_dict</span></div>
+
+<div class="viewcode-block" id="ActivationExtractor.get_layers_dict"><a class="viewcode-back" href="../../modules.html#revelionn.activation_extraction.ActivationExtractor.get_layers_dict">[docs]</a>    <span class="k">def</span> <span class="nf">get_layers_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a dictionary of neural network layers.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        layers_dict : dict</span>
+<span class="sd">            A dictionary of neural network layers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers_dict</span></div>
+
+<div class="viewcode-block" id="ActivationExtractor.get_layer_name_by_number"><a class="viewcode-back" href="../../modules.html#revelionn.activation_extraction.ActivationExtractor.get_layer_name_by_number">[docs]</a>    <span class="k">def</span> <span class="nf">get_layer_name_by_number</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">number</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the layer name in the layers dictionary by its number.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        number : int</span>
+<span class="sd">            Layer number.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Layer name.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">number</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">name</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">i</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()):</span>
+                <span class="k">return</span> <span class="n">name</span>
+        <span class="k">raise</span> <span class="sa">f</span><span class="s1">&#39;Layer </span><span class="si">{</span><span class="n">number</span><span class="si">}</span><span class="s1"> not found&#39;</span></div>
+
+<div class="viewcode-block" id="ActivationExtractor.get_activation"><a class="viewcode-back" href="../../modules.html#revelionn.activation_extraction.ActivationExtractor.get_activation">[docs]</a>    <span class="k">def</span> <span class="nf">get_activation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Saves the values of layer activations.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">            User-defined name of the neural network layer.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        hook</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">hook</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">activation</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span>
+
+        <span class="k">return</span> <span class="n">hook</span></div>
+
+<div class="viewcode-block" id="ActivationExtractor.register_hooks"><a class="viewcode-back" href="../../modules.html#revelionn.activation_extraction.ActivationExtractor.register_hooks">[docs]</a>    <span class="k">def</span> <span class="nf">register_hooks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Registers the interception of activations of the studied layers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers_for_research</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layers_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span><span class="o">.</span><span class="n">register_forward_hook</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_activation</span><span class="p">(</span><span class="n">layer</span><span class="p">))</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">prod</span><span class="p">(</span><span class="n">iterable</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">reduce</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">mul</span><span class="p">,</span> <span class="n">iterable</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ActivationExtractor.count_num_activations"><a class="viewcode-back" href="../../modules.html#revelionn.activation_extraction.ActivationExtractor.count_num_activations">[docs]</a>    <span class="k">def</span> <span class="nf">count_num_activations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_channels</span><span class="p">,</span> <span class="n">width_img</span><span class="p">,</span> <span class="n">height_img</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the number of activations of neurons of the studied layers.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        num_channels : int</span>
+<span class="sd">            Number of channels in the input image.</span>
+<span class="sd">        width_img : int</span>
+<span class="sd">            Width of the input image.</span>
+<span class="sd">        height_img : int</span>
+<span class="sd">            Height of the input image.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        num_activations : int</span>
+<span class="sd">            Number of neuron activations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_net</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="n">inp</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_channels</span><span class="p">,</span> <span class="n">width_img</span><span class="p">,</span> <span class="n">height_img</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">main_net</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
+
+        <span class="n">num_activations</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers_for_research</span><span class="p">:</span>
+            <span class="n">num_activations</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">activation</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">num_activations</span></div>
+
+<div class="viewcode-block" id="ActivationExtractor.get_activations"><a class="viewcode-back" href="../../modules.html#revelionn.activation_extraction.ActivationExtractor.get_activations">[docs]</a>    <span class="k">def</span> <span class="nf">get_activations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mapping_batch_size</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the activation tensor of the studied layers.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mapping_batch_size : int</span>
+<span class="sd">            The size of the data batch for training the mapping network.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        cur_acts : torch.Tensor or tuple[torch.Tensor]</span>
+<span class="sd">            Activations of the studied layers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_concatenate</span><span class="p">:</span>
+            <span class="n">cur_acts</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers_for_research</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;fc&#39;</span> <span class="ow">in</span> <span class="n">layer</span><span class="p">:</span>
+                    <span class="n">act</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="s1">&#39;bn&#39;</span> <span class="ow">in</span> <span class="n">layer</span> <span class="ow">or</span> <span class="s1">&#39;conv&#39;</span> <span class="ow">in</span> <span class="n">layer</span><span class="p">:</span>
+                    <span class="n">act</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">activation</span><span class="p">[</span><span class="n">layer</span><span class="p">],</span> <span class="p">(</span><span class="n">mapping_batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">cur_acts</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">cur_acts</span> <span class="o">=</span> <span class="n">act</span><span class="o">.</span><span class="n">T</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">cur_acts</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">cur_acts</span><span class="p">,</span> <span class="n">act</span><span class="o">.</span><span class="n">T</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">cur_acts</span><span class="o">.</span><span class="n">T</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">acts</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers_for_research</span><span class="p">:</span>
+                <span class="n">acts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">activation</span><span class="p">[</span><span class="n">layer</span><span class="p">])</span>
+            <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">acts</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ActivationExtractor.set_layers_for_research"><a class="viewcode-back" href="../../modules.html#revelionn.activation_extraction.ActivationExtractor.set_layers_for_research">[docs]</a>    <span class="k">def</span> <span class="nf">set_layers_for_research</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layers</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the list of layers to be examined.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        layers : list[str] or list[int]</span>
+<span class="sd">            Contains layer names or layer numbers (indexing from 0) available in the dictionary of layers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">all_elements_are_int</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">layers</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">all_elements_are_int</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">layers</span><span class="p">)):</span>
+                <span class="n">layers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_layer_name_by_number</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">layers</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">layer</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">raise</span> <span class="sa">f</span><span class="s1">&#39;Not found </span><span class="si">{</span><span class="n">layer</span><span class="si">}</span><span class="s1"> in layers_dict&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers_for_research</span> <span class="o">=</span> <span class="n">layers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_hooks</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ActivationExtractor.get_layers_for_research"><a class="viewcode-back" href="../../modules.html#revelionn.activation_extraction.ActivationExtractor.get_layers_for_research">[docs]</a>    <span class="k">def</span> <span class="nf">get_layers_for_research</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of the layers under study.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        layers_for_research : list</span>
+<span class="sd">            The list of layers to be examined.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers_for_research</span></div>
+
+<div class="viewcode-block" id="ActivationExtractor.get_main_net"><a class="viewcode-back" href="../../modules.html#revelionn.activation_extraction.ActivationExtractor.get_main_net">[docs]</a>    <span class="k">def</span> <span class="nf">get_main_net</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the main neural network.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        main_net : torch.nn.Module</span>
+<span class="sd">            The main neural network.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_net</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RevelioNN authors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

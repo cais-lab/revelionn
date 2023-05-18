@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Introduction &mdash; RevelioNN  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Usage Scenarios" href="scenarios.html" />
+    <link rel="prev" title="Welcome to RevelioNN’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            RevelioNN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#quick-start">Quick Start</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scenarios.html">Usage Scenarios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_usage.html">Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">RevelioNN Modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RevelioNN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Introduction</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/intro.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h1>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h2>
+<p>The recommended way of using the library is to copy the contents of the <code class="docutils literal notranslate"><span class="pre">revelionn</span></code>
+folder of the repository to your project. Install all the necessary missing dependencies for RevelioNN. In order to do so, you may
+want to run:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ pip install -r requirements.txt
+</pre></div>
+</div>
+<p>To use ready-made scripts, you can clone the repository, create a
+virtual environment and install dependencies:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ git clone ...
+$ <span class="nb">cd</span> revelionn
+$ python3 -m venv venv
+$ <span class="nb">source</span> venv/bin/activate
+$ pip install -r requirements.txt
+</pre></div>
+</div>
+<p>Another way to install RevelioNN would be to import the Conda environment:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>conda env create -f conda_environment.yml
+conda activate revelionn
+</pre></div>
+</div>
+<p>It is also worth noting that <a class="reference external" href="https://www.java.com/en/download/manual.jsp">Java SE 8</a> must be installed to form logical explanations.
+This is due to the fact that explanations using ontology are implemented using the external <a class="reference external" href="https://ml.unife.it/bundle/">BUNDLE</a> library.</p>
+</section>
+<section id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this heading"></a></h2>
+<p>There are two ways to use the RevelioNN library. One of them is to use the API provided by the library. This method can
+be useful for implementing your own library usage scenarios, as well as advanced use cases (see <a class="reference external" href="advanced_usage.html">Advanced Usage</a>).
+The second way is to use ready-made scripts via the command line.</p>
+<p>Anyway, to use both methods, you need to do a few general steps:</p>
+<ol class="arabic">
+<li><p>Your network class must be described in a separate file in which the following variables must also be declared:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>variable storing the number of channels of the image fed to the network;</p></li>
+<li><p>variable storing the size of the image fed to the network;</p></li>
+<li><p>the torchvision.transforms module object, which represents a transformation over images.</p></li>
+</ul>
+</div></blockquote>
+<p>Examples of network descriptions are given in the <code class="docutils literal notranslate"><span class="pre">main_net_classes</span></code> directory. It is recommended to place your file in this directory as well.</p>
+<blockquote>
+<div><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The network class must be inherited from the <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> class, that is, your network must be implemented using PyTorch.</p>
+</div>
+</div></blockquote>
+</li>
+<li><p>Prepare an image dataset according to the data format specification (see <a class="reference external" href="data.html#dataset-representation">Dataset Representation</a>).</p></li>
+<li><p>Prepare the dataset ontology according to the documentation instructions (see <a class="reference external" href="data.html#ontology-representation">Ontology Representation</a>).
+Optional, but necessary to use concept extraction algorithms.</p></li>
+</ol>
+<p>RevelioNN can interpret convolutional binary classification networks that have already been trained without using this
+library. To do this, the specified model must be converted to RevelioNN format.</p>
+<blockquote>
+<div><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To convert to the RevelioNN format, your model file should contain only <code class="docutils literal notranslate"><span class="pre">state_dict</span></code>, which is typical for most cases.</p>
+</div>
+</div></blockquote>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to RevelioNN’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="scenarios.html" class="btn btn-neutral float-right" title="Usage Scenarios" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RevelioNN authors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

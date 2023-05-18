@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>revelionn.mapping_trainer &mdash; RevelioNN  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            RevelioNN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scenarios.html">Usage Scenarios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced_usage.html">Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">RevelioNN Modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">RevelioNN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">revelionn.mapping_trainer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for revelionn.mapping_trainer</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">optim</span>
+
+<span class="kn">from</span> <span class="nn">.activation_extraction</span> <span class="kn">import</span> <span class="n">ActivationExtractor</span>
+<span class="kn">from</span> <span class="nn">.early_stopping</span> <span class="kn">import</span> <span class="n">EarlyStopping</span>
+<span class="kn">from</span> <span class="nn">.main_module</span> <span class="kn">import</span> <span class="n">MainModelProcessing</span>
+<span class="kn">from</span> <span class="nn">.mapping_module</span> <span class="kn">import</span> <span class="n">MappingModelProcessing</span>
+<span class="kn">from</span> <span class="nn">.mapping_nets.simultaneous_mapping_net</span> <span class="kn">import</span> <span class="n">SimultaneousMappingNet</span>
+<span class="kn">from</span> <span class="nn">.mapping_nets.single_mapping_net</span> <span class="kn">import</span> <span class="n">SingleMappingNet</span>
+<span class="kn">from</span> <span class="nn">.datasets</span> <span class="kn">import</span> <span class="n">create_dataloader</span>
+
+
+<div class="viewcode-block" id="MappingTrainer"><a class="viewcode-back" href="../../modules.html#revelionn.mapping_trainer.MappingTrainer">[docs]</a><span class="k">class</span> <span class="nc">MappingTrainer</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mapping Trainer class provides an interface for learning/evaluating mapping networks</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    train_single_model(mapping_neurons, concept, layer_names)</span>
+<span class="sd">        Trains a single mapping network for a given concept based on the activations of given layers.</span>
+<span class="sd">    train_simultaneous_model(concepts, decoder_channels, num_shared_neurons, num_output_neurons)</span>
+<span class="sd">        Trains a simultaneous mapping network for a given set of concepts based on the activations of layers of</span>
+<span class="sd">        previously defined types.</span>
+<span class="sd">    train_simultaneous_model_semisupervised(concepts, decoder_channels, num_shared_neurons, num_output_neurons,</span>
+<span class="sd">    semantic_loss, sem_loss_weight, unlabeled_samples)</span>
+<span class="sd">        Trains a simultaneous mapping network for a given set of concepts using semi-supervised learning, in which a</span>
+<span class="sd">        semantic loss is calculated for unlabeled samples, taking into account the relationships between the concepts.</span>
+<span class="sd">    evaluate_model()</span>
+<span class="sd">        Evaluates the mapping network model on the test set using the ROC AUC.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">main_model_filepath</span><span class="p">,</span> <span class="n">layers_types</span><span class="p">,</span> <span class="n">patience</span><span class="p">,</span> <span class="n">epochs</span><span class="p">,</span> <span class="n">path_to_save</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span>
+                 <span class="n">path_to_images</span><span class="p">,</span> <span class="n">path_to_train_csv</span><span class="p">,</span> <span class="n">path_to_valid_csv</span><span class="p">,</span> <span class="n">image_names_column</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span>
+                 <span class="n">path_to_test_csv</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        main_model_filepath : str</span>
+<span class="sd">            File path containing the parameters of the main network model.</span>
+<span class="sd">        layers_types : list[str]</span>
+<span class="sd">            Types of layers to be identified (&#39;bn&#39;, &#39;fc&#39;, &#39;conv&#39;).</span>
+<span class="sd">        patience : int</span>
+<span class="sd">            How many epochs to wait after last time validation loss improved.</span>
+<span class="sd">        epochs : int</span>
+<span class="sd">            Number of network learning epochs.</span>
+<span class="sd">        path_to_save : str</span>
+<span class="sd">            Path for saving models.</span>
+<span class="sd">        device : torch.device</span>
+<span class="sd">            Tensor processing device.</span>
+<span class="sd">        path_to_images : str</span>
+<span class="sd">            The path to the folder with images.</span>
+<span class="sd">        path_to_train_csv : str</span>
+<span class="sd">            The path to the csv file with training data.</span>
+<span class="sd">        path_to_valid_csv : str</span>
+<span class="sd">            The path to the csv file with validation data.</span>
+<span class="sd">        image_names_column : str</span>
+<span class="sd">            The name of the column containing the names and extensions of the image files.</span>
+<span class="sd">        batch_size : int</span>
+<span class="sd">            Batch size.</span>
+<span class="sd">        num_workers : int</span>
+<span class="sd">            The number of loader worker processes for multi-process data loading.</span>
+<span class="sd">        path_to_test_csv : str</span>
+<span class="sd">            The path to the csv file with test data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">main_model_data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">main_model_filepath</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;main_net_classes.&quot;</span>
+                                         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">main_model_data</span><span class="p">[</span><span class="s1">&#39;main_net_module_name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">main_net</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">main_model_data</span><span class="p">[</span><span class="s1">&#39;main_net_class&#39;</span><span class="p">])()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_module</span> <span class="o">=</span> <span class="n">MainModelProcessing</span><span class="p">(</span><span class="n">main_net</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_module</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">main_model_filepath</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transformation</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">main_model_data</span><span class="p">[</span><span class="s1">&#39;transformation_name&#39;</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_net_module_name</span> <span class="o">=</span> <span class="n">main_model_data</span><span class="p">[</span><span class="s1">&#39;main_net_module_name&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_net_class</span> <span class="o">=</span> <span class="n">main_model_data</span><span class="p">[</span><span class="s1">&#39;main_net_class&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_model_filepath</span> <span class="o">=</span> <span class="n">main_model_filepath</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transformation_name</span> <span class="o">=</span> <span class="n">main_model_data</span><span class="p">[</span><span class="s1">&#39;transformation_name&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img_size</span> <span class="o">=</span> <span class="n">main_model_data</span><span class="p">[</span><span class="s1">&#39;img_size&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_channels</span> <span class="o">=</span> <span class="n">main_model_data</span><span class="p">[</span><span class="s1">&#39;num_channels&#39;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers_types</span> <span class="o">=</span> <span class="n">layers_types</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mapping_module</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation_extractor</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">patience</span> <span class="o">=</span> <span class="n">patience</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span> <span class="o">=</span> <span class="n">epochs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path_to_save</span> <span class="o">=</span> <span class="n">path_to_save</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path_to_images</span> <span class="o">=</span> <span class="n">path_to_images</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path_to_train_csv</span> <span class="o">=</span> <span class="n">path_to_train_csv</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path_to_valid_csv</span> <span class="o">=</span> <span class="n">path_to_valid_csv</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_names_column</span> <span class="o">=</span> <span class="n">image_names_column</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="n">num_workers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path_to_test_csv</span> <span class="o">=</span> <span class="n">path_to_test_csv</span>
+
+<div class="viewcode-block" id="MappingTrainer.train_single_model"><a class="viewcode-back" href="../../modules.html#revelionn.mapping_trainer.MappingTrainer.train_single_model">[docs]</a>    <span class="k">def</span> <span class="nf">train_single_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mapping_neurons</span><span class="p">,</span> <span class="n">concept</span><span class="p">,</span> <span class="n">layer_names</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Trains a single mapping network for a given concept based on the activations of given layers.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mapping_neurons : list[int]</span>
+<span class="sd">            The number of neurons in consecutive fully connected layers. The output layer should always have 1 neuron.</span>
+<span class="sd">        concept : str</span>
+<span class="sd">            The target concept for which to train the mapping network.</span>
+<span class="sd">        layer_names : list[str]</span>
+<span class="sd">            A list of layer names to consider for training and evaluation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">train_loader</span> <span class="o">=</span> <span class="n">create_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_train_csv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_to_images</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_names_column</span><span class="p">,</span>
+                                         <span class="p">[</span><span class="n">concept</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformation</span><span class="p">)</span>
+        <span class="n">valid_loader</span> <span class="o">=</span> <span class="n">create_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_valid_csv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_to_images</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_names_column</span><span class="p">,</span>
+                                         <span class="p">[</span><span class="n">concept</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation_extractor</span> <span class="o">=</span> <span class="n">ActivationExtractor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main_module</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers_types</span><span class="p">,</span> <span class="n">is_concatenate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation_extractor</span><span class="o">.</span><span class="n">set_layers_for_research</span><span class="p">(</span><span class="n">layer_names</span><span class="p">)</span>
+        <span class="n">mapping_net</span> <span class="o">=</span> <span class="n">SingleMappingNet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">activation_extractor</span><span class="o">.</span><span class="n">count_num_activations</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_channels</span><span class="p">,</span>
+                                                                                       <span class="bp">self</span><span class="o">.</span><span class="n">img_size</span><span class="p">,</span>
+                                                                                       <span class="bp">self</span><span class="o">.</span><span class="n">img_size</span><span class="p">),</span>
+                                       <span class="n">mapping_neurons</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mapping_module</span> <span class="o">=</span> <span class="n">MappingModelProcessing</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">activation_extractor</span><span class="p">,</span> <span class="n">mapping_net</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">mapping_net</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+        <span class="n">early_stopping</span> <span class="o">=</span> <span class="n">EarlyStopping</span><span class="p">(</span><span class="n">patience</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">patience</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mapping_module</span><span class="o">.</span><span class="n">train_model_single</span><span class="p">(</span><span class="n">train_loader</span><span class="p">,</span> <span class="n">valid_loader</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">early_stopping</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="p">,</span>
+                                               <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_save</span><span class="p">,</span>
+                                                            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">concept</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">layer_names</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">mapping_neurons</span><span class="si">}</span><span class="s1">_&#39;</span>
+                                                            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">main_module</span><span class="o">.</span><span class="n">get_class_labels</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">),</span>
+                                               <span class="n">concept</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_net_module_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_net_class</span><span class="p">,</span>
+                                               <span class="bp">self</span><span class="o">.</span><span class="n">main_model_filepath</span><span class="p">,</span>
+                                               <span class="bp">self</span><span class="o">.</span><span class="n">transformation_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_channels</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MappingTrainer.train_simultaneous_model"><a class="viewcode-back" href="../../modules.html#revelionn.mapping_trainer.MappingTrainer.train_simultaneous_model">[docs]</a>    <span class="k">def</span> <span class="nf">train_simultaneous_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concepts</span><span class="p">,</span> <span class="n">decoder_channels</span><span class="p">,</span> <span class="n">num_shared_neurons</span><span class="p">,</span> <span class="n">num_output_neurons</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Trains a simultaneous mapping network for a given set of concepts based on the activations of layers of</span>
+<span class="sd">        previously defined types.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        concepts : list[str]</span>
+<span class="sd">            The target concepts for which to train the mapping network.</span>
+<span class="sd">        decoder_channels : int</span>
+<span class="sd">            The number of decoder channels. The output number of channels of the convolutional layer of the decoder or</span>
+<span class="sd">            the output number of neurons of the decoder of the fully connected layer.</span>
+<span class="sd">        num_shared_neurons : list[int]</span>
+<span class="sd">            The number of neurons in consecutive fully connected layers of the common part of the network</span>
+<span class="sd">            (internal representation of the simultaneous extraction network).</span>
+<span class="sd">        num_output_neurons : list[int]</span>
+<span class="sd">            The number of neurons in consecutive fully connected layers of each of the concept blocks.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">train_loader</span> <span class="o">=</span> <span class="n">create_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_train_csv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_to_images</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_names_column</span><span class="p">,</span>
+                                         <span class="n">concepts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformation</span><span class="p">)</span>
+        <span class="n">valid_loader</span> <span class="o">=</span> <span class="n">create_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_valid_csv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_to_images</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_names_column</span><span class="p">,</span>
+                                         <span class="n">concepts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation_extractor</span> <span class="o">=</span> <span class="n">ActivationExtractor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main_module</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers_types</span><span class="p">,</span> <span class="n">is_concatenate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation_extractor</span><span class="o">.</span><span class="n">set_layers_for_research</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">activation_extractor</span><span class="o">.</span><span class="n">get_layers_dict</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="n">mapping_net</span> <span class="o">=</span> <span class="n">SimultaneousMappingNet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">activation_extractor</span><span class="p">,</span> <span class="n">decoder_channels</span><span class="p">,</span> <span class="n">num_shared_neurons</span><span class="p">,</span>
+                                             <span class="n">num_output_neurons</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">concepts</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mapping_module</span> <span class="o">=</span> <span class="n">MappingModelProcessing</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">activation_extractor</span><span class="p">,</span> <span class="n">mapping_net</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">mapping_net</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+        <span class="n">early_stopping</span> <span class="o">=</span> <span class="n">EarlyStopping</span><span class="p">(</span><span class="n">patience</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">patience</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mapping_module</span><span class="o">.</span><span class="n">train_model_simultaneous</span><span class="p">(</span><span class="n">train_loader</span><span class="p">,</span> <span class="n">valid_loader</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">early_stopping</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="p">,</span>
+                                                     <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_save</span><span class="p">,</span>
+                                                                  <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">main_module</span><span class="o">.</span><span class="n">get_class_labels</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">_&#39;</span>
+                                                                  <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">decoder_channels</span><span class="si">}</span><span class="s1">_&#39;</span>
+                                                                  <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">num_shared_neurons</span><span class="si">}</span><span class="s1">_&#39;</span>
+                                                                  <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">num_output_neurons</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">),</span>
+                                                     <span class="n">concepts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_net_module_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_net_class</span><span class="p">,</span>
+                                                     <span class="bp">self</span><span class="o">.</span><span class="n">main_model_filepath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformation_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_size</span><span class="p">,</span>
+                                                     <span class="bp">self</span><span class="o">.</span><span class="n">num_channels</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MappingTrainer.train_simultaneous_model_semisupervised"><a class="viewcode-back" href="../../modules.html#revelionn.mapping_trainer.MappingTrainer.train_simultaneous_model_semisupervised">[docs]</a>    <span class="k">def</span> <span class="nf">train_simultaneous_model_semisupervised</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concepts</span><span class="p">,</span> <span class="n">decoder_channels</span><span class="p">,</span> <span class="n">num_shared_neurons</span><span class="p">,</span>
+                                                <span class="n">num_output_neurons</span><span class="p">,</span> <span class="n">semantic_loss</span><span class="p">,</span> <span class="n">sem_loss_weight</span><span class="p">,</span> <span class="n">unlabeled_samples</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Trains a simultaneous mapping network for a given set of concepts using semi-supervised learning, in which a</span>
+<span class="sd">        semantic loss is calculated for unlabeled samples, taking into account the relationships between the concepts.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        concepts : list[str]</span>
+<span class="sd">            The target concepts for which to train the mapping network.</span>
+<span class="sd">        decoder_channels : int</span>
+<span class="sd">            The number of decoder channels. The output number of channels of the convolutional layer of the decoder or</span>
+<span class="sd">            the output number of neurons of the decoder of the fully connected layer.</span>
+<span class="sd">        num_shared_neurons : list[int]</span>
+<span class="sd">            The number of neurons in consecutive fully connected layers of the common part of the network</span>
+<span class="sd">            (internal representation of the simultaneous extraction network).</span>
+<span class="sd">        num_output_neurons : list[int]</span>
+<span class="sd">            The number of neurons in consecutive fully connected layers of each of the concept blocks.</span>
+<span class="sd">        semantic_loss : semantic_loss_pytorch.SemanticLoss</span>
+<span class="sd">            An object of the semantic loss class, for initialization of which it is necessary to use the generated .sdd</span>
+<span class="sd">            and .vtree.</span>
+<span class="sd">        sem_loss_weight : float</span>
+<span class="sd">            The contribution of semantic loss to the overall loss function.</span>
+<span class="sd">        unlabeled_samples : int or float</span>
+<span class="sd">            The number of unlabeled samples to include. If float, it represents the fraction of unlabeled samples.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">train_loader</span> <span class="o">=</span> <span class="n">create_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_train_csv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_to_images</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_names_column</span><span class="p">,</span>
+                                         <span class="n">concepts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformation</span><span class="p">,</span>
+                                         <span class="n">unlabeled_samples</span><span class="p">)</span>
+        <span class="n">valid_loader</span> <span class="o">=</span> <span class="n">create_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_valid_csv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_to_images</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_names_column</span><span class="p">,</span>
+                                         <span class="n">concepts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation_extractor</span> <span class="o">=</span> <span class="n">ActivationExtractor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main_module</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers_types</span><span class="p">,</span> <span class="n">is_concatenate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation_extractor</span><span class="o">.</span><span class="n">set_layers_for_research</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">activation_extractor</span><span class="o">.</span><span class="n">get_layers_dict</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="n">mapping_net</span> <span class="o">=</span> <span class="n">SimultaneousMappingNet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">activation_extractor</span><span class="p">,</span> <span class="n">decoder_channels</span><span class="p">,</span> <span class="n">num_shared_neurons</span><span class="p">,</span>
+                                             <span class="n">num_output_neurons</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">concepts</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mapping_module</span> <span class="o">=</span> <span class="n">MappingModelProcessing</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">activation_extractor</span><span class="p">,</span> <span class="n">mapping_net</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">mapping_net</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+        <span class="n">early_stopping</span> <span class="o">=</span> <span class="n">EarlyStopping</span><span class="p">(</span><span class="n">patience</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">patience</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mapping_module</span><span class="o">.</span><span class="n">train_model_semisupervised</span><span class="p">(</span><span class="n">train_loader</span><span class="p">,</span> <span class="n">valid_loader</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">early_stopping</span><span class="p">,</span>
+                                                       <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="p">,</span> <span class="n">semantic_loss</span><span class="p">,</span> <span class="n">sem_loss_weight</span><span class="p">,</span>
+                                                       <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_save</span><span class="p">,</span>
+                                                                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">main_module</span><span class="o">.</span><span class="n">get_class_labels</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">_&#39;</span>
+                                                                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">sem_loss_weight</span><span class="si">}</span><span class="s1">_&#39;</span>
+                                                                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">decoder_channels</span><span class="si">}</span><span class="s1">_&#39;</span>
+                                                                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">num_shared_neurons</span><span class="si">}</span><span class="s1">_&#39;</span>
+                                                                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">num_output_neurons</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">),</span>
+                                                       <span class="n">concepts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_net_module_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_net_class</span><span class="p">,</span>
+                                                       <span class="bp">self</span><span class="o">.</span><span class="n">main_model_filepath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformation_name</span><span class="p">,</span>
+                                                       <span class="bp">self</span><span class="o">.</span><span class="n">img_size</span><span class="p">,</span>
+                                                       <span class="bp">self</span><span class="o">.</span><span class="n">num_channels</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MappingTrainer.evaluate_model"><a class="viewcode-back" href="../../modules.html#revelionn.mapping_trainer.MappingTrainer.evaluate_model">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluates the mapping network model on the test set using the ROC AUC.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The ROC AUC value of a single mapping network or the ROC AUC value for all labels of a simultaneous mapping</span>
+<span class="sd">            network.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">test_loader</span> <span class="o">=</span> <span class="n">create_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_test_csv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_to_images</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_names_column</span><span class="p">,</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">mapping_module</span><span class="o">.</span><span class="n">get_class_labels</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">transformation</span><span class="p">)</span>
+        <span class="n">concepts_auc</span><span class="p">,</span> <span class="n">all_auc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapping_module</span><span class="o">.</span><span class="n">evaluate_model</span><span class="p">(</span><span class="n">test_loader</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">concepts_auc</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">all_auc</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">concepts_auc</span><span class="p">,</span> <span class="n">all_auc</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RevelioNN authors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

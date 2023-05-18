@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>revelionn.mapping_nets.simultaneous_mapping_net &mdash; RevelioNN  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            RevelioNN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../scenarios.html">Usage Scenarios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_usage.html">Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">RevelioNN Modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">RevelioNN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">revelionn.mapping_nets.simultaneous_mapping_net</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for revelionn.mapping_nets.simultaneous_mapping_net</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+
+
+<div class="viewcode-block" id="MappingModule"><a class="viewcode-back" href="../../../modules.html#revelionn.mapping_nets.simultaneous_mapping_net.MappingModule">[docs]</a><span class="k">class</span> <span class="nc">MappingModule</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A module representing a common fully connected part of a simultaneous mapping network and blocks of concepts.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    common_layers : nn.Sequential</span>
+<span class="sd">        The shared layers.</span>
+<span class="sd">    output_layers_list : nn.ModuleList</span>
+<span class="sd">        A list of output layers, each of which maps the input tensor to an output tensor.</span>
+<span class="sd">    sigmoid : nn.Sigmoid</span>
+<span class="sd">        The sigmoid function used to transform the output tensor(s).</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    generate_layers(num_neurons)</span>
+<span class="sd">        Generates a list of PyTorch layers based on the number of neurons in each layer.</span>
+
+<span class="sd">    forward(x)</span>
+<span class="sd">        Forward pass through the module.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_features</span><span class="p">,</span> <span class="n">num_shared_neurons</span><span class="p">,</span> <span class="n">num_output_neurons</span><span class="p">,</span> <span class="n">num_outs</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets all the necessary attributes for the MappingModule object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        in_features : int</span>
+<span class="sd">            The number of input features.</span>
+<span class="sd">        num_shared_neurons : list[int]</span>
+<span class="sd">            The number of neurons in consecutive fully connected layers of the common part of the network</span>
+<span class="sd">            (internal representation of the simultaneous extraction network).</span>
+<span class="sd">        num_output_neurons : list[int]</span>
+<span class="sd">            The number of neurons in consecutive fully connected layers of each of the concept blocks.</span>
+<span class="sd">        num_outs : int</span>
+<span class="sd">            The number of outputs of the simultaneous extraction network. It is determined by the number of extracted</span>
+<span class="sd">            concepts.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">MappingModule</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="n">num_shared_neurons</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">num_shared_neurons</span><span class="p">)</span>
+        <span class="n">num_output_neurons</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">num_output_neurons</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">num_shared_neurons</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">num_shared_neurons</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">num_output_neurons</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The last element of num_shared_neurons list must have the same value as the first &#39;</span>
+                             <span class="s1">&#39;element of num_output_neurons list.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">num_shared_neurons</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">num_shared_neurons</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">in_features</span><span class="p">)</span>
+            <span class="n">common_layers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_layers</span><span class="p">(</span><span class="n">num_shared_neurons</span><span class="p">)</span>
+            <span class="n">common_layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">common_layers</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="nb">tuple</span><span class="p">(</span><span class="n">common_layers</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">num_output_neurons</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">in_features</span><span class="p">)</span>
+
+        <span class="n">output_layers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_layers</span><span class="p">(</span><span class="n">num_output_neurons</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_layers_list</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_outs</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_layers_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="nb">tuple</span><span class="p">(</span><span class="n">output_layers</span><span class="p">))))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigmoid</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sigmoid</span><span class="p">()</span>
+
+<div class="viewcode-block" id="MappingModule.generate_layers"><a class="viewcode-back" href="../../../modules.html#revelionn.mapping_nets.simultaneous_mapping_net.MappingModule.generate_layers">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">generate_layers</span><span class="p">(</span><span class="n">num_neurons</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates a list of PyTorch layers based on the number of neurons in each layer.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        num_neurons : list[int]</span>
+<span class="sd">            The number of neurons in consecutive fully connected layers.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list[nn.Module]</span>
+<span class="sd">            A list of PyTorch layers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">layers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">num_neurons</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">!=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">num_neurons</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">num_neurons</span><span class="p">):</span>
+                <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">num_neurons</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">num_neurons</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">layers</span></div>
+
+<div class="viewcode-block" id="MappingModule.forward"><a class="viewcode-back" href="../../../modules.html#revelionn.mapping_nets.simultaneous_mapping_net.MappingModule.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Forward pass through the module.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : torch.Tensor</span>
+<span class="sd">            The input tensor.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple[torch.Tensor]</span>
+<span class="sd">            The output tensor(s).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">common_layers</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">outs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">output_layers</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_layers_list</span><span class="p">):</span>
+            <span class="n">outs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_layers</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+            <span class="n">outs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">outs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">outs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="LayerDecoder"><a class="viewcode-back" href="../../../modules.html#revelionn.mapping_nets.simultaneous_mapping_net.LayerDecoder">[docs]</a><span class="k">class</span> <span class="nc">LayerDecoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Module consisting of a 1x1 convolution layer, followed by a ReLU activation function, a global average pooling</span>
+<span class="sd">    layer, and a flattening layer.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    in_channels : int</span>
+<span class="sd">        The number of input channels to the 1x1 convolution layer.</span>
+<span class="sd">    out_channels : int</span>
+<span class="sd">        The number of output channels from the 1x1 convolution layer.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    layers : nn.Sequential</span>
+<span class="sd">        A sequential container of the layers that make up this module.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    forward(x)</span>
+<span class="sd">        Forward pass through the module.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets all the necessary attributes for the LayerDecoder object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        in_channels : int</span>
+<span class="sd">            The number of input channels to the 1x1 convolution layer.</span>
+<span class="sd">        out_channels : int</span>
+<span class="sd">            The number of output channels from the 1x1 convolution layer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LayerDecoder</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">AdaptiveAvgPool2d</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Flatten</span><span class="p">()</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="LayerDecoder.forward"><a class="viewcode-back" href="../../../modules.html#revelionn.mapping_nets.simultaneous_mapping_net.LayerDecoder.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Forward pass through the module.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : torch.Tensor</span>
+<span class="sd">            The input tensor of shape (batch_size, in_channels, height, width).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        torch.Tensor</span>
+<span class="sd">            The output tensor of shape (batch_size, out_channels).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span></div></div>
+
+
+<div class="viewcode-block" id="SimultaneousMappingNet"><a class="viewcode-back" href="../../../modules.html#revelionn.mapping_nets.simultaneous_mapping_net.SimultaneousMappingNet">[docs]</a><span class="k">class</span> <span class="nc">SimultaneousMappingNet</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simultaneous Mapping Network for RevelioNN.</span>
+
+<span class="sd">    Receives an input tuple of activations of the specified convolutional network layers, after which the input tensors</span>
+<span class="sd">    are processed by decoder blocks. The output tensors of each of the decoders are concatenated and fed into a common</span>
+<span class="sd">    fully connected part of the network. This is followed by blocks of concepts (one for each of the concepts), which</span>
+<span class="sd">    are sets of fully connected layers having 1 neuron and a sigmoid at the output.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    decoder_channels : int</span>
+<span class="sd">        The number of decoder channels. The output number of channels of the convolutional layer of the decoder or the</span>
+<span class="sd">        output number of neurons of the decoder of the fully connected layer.</span>
+<span class="sd">    num_shared_neurons : list[int]</span>
+<span class="sd">        The number of neurons in consecutive fully connected layers of the common part of the network</span>
+<span class="sd">        (internal representation of the simultaneous extraction network).</span>
+<span class="sd">    num_output_neurons : list[int]</span>
+<span class="sd">        The number of neurons in consecutive fully connected layers of each of the concept blocks.</span>
+<span class="sd">    num_outs : int</span>
+<span class="sd">        The number of outputs of the simultaneous extraction network. It is determined by the number of extracted</span>
+<span class="sd">        concepts.</span>
+<span class="sd">    decoders : torch.nn.ModuleList</span>
+<span class="sd">        Contains the generated decoder blocks in the list.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    forward(x)</span>
+<span class="sd">        Forward pass through the network.</span>
+<span class="sd">    get_decoder_channels()</span>
+<span class="sd">        Returns the number of decoder channels.</span>
+<span class="sd">    get_num_shared_neurons()</span>
+<span class="sd">        Returns the number of neurons in consecutive fully connected layers of the common part of the network.</span>
+<span class="sd">    get_num_output_neurons()</span>
+<span class="sd">        Returns the number of neurons in consecutive fully connected layers of each of the concept blocks.</span>
+<span class="sd">    get_num_outs()</span>
+<span class="sd">        Returns the number of outputs of the simultaneous extraction network.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">activation_extractor</span><span class="p">,</span> <span class="n">decoder_channels</span><span class="p">,</span> <span class="n">num_shared_neurons</span><span class="p">,</span> <span class="n">num_output_neurons</span><span class="p">,</span> <span class="n">num_outs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets all the necessary attributes for the SingleMappingNet object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        activation_extractor : ActivationExtractor</span>
+<span class="sd">            Input number of neuron activations. Can be calculated by the count_num_activations() method of the</span>
+<span class="sd">            ActivationExtractor class.</span>
+<span class="sd">        decoder_channels : int</span>
+<span class="sd">            The number of decoder channels. The output number of channels of the convolutional layer of the decoder or</span>
+<span class="sd">            the output number of neurons of the decoder of the fully connected layer.</span>
+<span class="sd">        num_shared_neurons : list[int]</span>
+<span class="sd">            The number of neurons in consecutive fully connected layers of the common part of the network</span>
+<span class="sd">            (internal representation of the simultaneous extraction network).</span>
+<span class="sd">        num_output_neurons : list[int]</span>
+<span class="sd">            The number of neurons in consecutive fully connected layers of each of the concept blocks.</span>
+<span class="sd">        num_outs : int</span>
+<span class="sd">            The number of outputs of the simultaneous extraction network. It is determined by the number of extracted</span>
+<span class="sd">            concepts.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">SimultaneousMappingNet</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder_channels</span> <span class="o">=</span> <span class="n">decoder_channels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_shared_neurons</span> <span class="o">=</span> <span class="n">num_shared_neurons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_output_neurons</span> <span class="o">=</span> <span class="n">num_output_neurons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_outs</span> <span class="o">=</span> <span class="n">num_outs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoders</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">activation_extractor</span><span class="o">.</span><span class="n">is_concatenate</span><span class="p">:</span>
+            <span class="n">layers_dict</span> <span class="o">=</span> <span class="n">activation_extractor</span><span class="o">.</span><span class="n">get_layers_dict</span><span class="p">()</span>
+            <span class="n">layers_for_research</span> <span class="o">=</span> <span class="n">activation_extractor</span><span class="o">.</span><span class="n">get_layers_for_research</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">layer_name</span> <span class="ow">in</span> <span class="n">layers_for_research</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layers_dict</span><span class="p">[</span><span class="n">layer_name</span><span class="p">],</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">decoders</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">LayerDecoder</span><span class="p">(</span><span class="n">layers_dict</span><span class="p">[</span><span class="n">layer_name</span><span class="p">]</span><span class="o">.</span><span class="n">num_features</span><span class="p">,</span> <span class="n">decoder_channels</span><span class="p">))</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layers_dict</span><span class="p">[</span><span class="n">layer_name</span><span class="p">],</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">decoders</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">LayerDecoder</span><span class="p">(</span><span class="n">layers_dict</span><span class="p">[</span><span class="n">layer_name</span><span class="p">]</span><span class="o">.</span><span class="n">out_channels</span><span class="p">,</span> <span class="n">decoder_channels</span><span class="p">))</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layers_dict</span><span class="p">[</span><span class="n">layer_name</span><span class="p">],</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">decoders</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">layers_dict</span><span class="p">[</span><span class="n">layer_name</span><span class="p">]</span><span class="o">.</span><span class="n">out_features</span><span class="p">,</span> <span class="n">decoder_channels</span><span class="p">))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">mapping_module</span> <span class="o">=</span> <span class="n">MappingModule</span><span class="p">(</span><span class="n">decoder_channels</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">decoders</span><span class="p">),</span> <span class="n">num_shared_neurons</span><span class="p">,</span>
+                                                <span class="n">num_output_neurons</span><span class="p">,</span> <span class="n">num_outs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ActivationExtractor.is_concatenate must be set to False for its use in &quot;</span>
+                             <span class="s2">&quot;SimultaneousMappingNet.&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SimultaneousMappingNet.forward"><a class="viewcode-back" href="../../../modules.html#revelionn.mapping_nets.simultaneous_mapping_net.SimultaneousMappingNet.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">activations</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Forward pass through the network.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        activations : tuple[torch.Tensor]</span>
+<span class="sd">            A list of input activations.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        torch.Tensor</span>
+<span class="sd">            The output tensor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">outs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">decoders</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">decoder</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">decoders</span><span class="p">):</span>
+                <span class="n">outs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">decoder</span><span class="p">(</span><span class="n">activations</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+        <span class="n">outs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">outs</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">outs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapping_module</span><span class="p">(</span><span class="n">outs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">outs</span></div>
+
+<div class="viewcode-block" id="SimultaneousMappingNet.get_decoder_channels"><a class="viewcode-back" href="../../../modules.html#revelionn.mapping_nets.simultaneous_mapping_net.SimultaneousMappingNet.get_decoder_channels">[docs]</a>    <span class="k">def</span> <span class="nf">get_decoder_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the number of decoder channels.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            The number of decoder channels. The output number of channels of the convolutional layer of the decoder or</span>
+<span class="sd">            the output number of neurons of the decoder of the fully connected layer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder_channels</span></div>
+
+<div class="viewcode-block" id="SimultaneousMappingNet.get_num_shared_neurons"><a class="viewcode-back" href="../../../modules.html#revelionn.mapping_nets.simultaneous_mapping_net.SimultaneousMappingNet.get_num_shared_neurons">[docs]</a>    <span class="k">def</span> <span class="nf">get_num_shared_neurons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the number of shared neurons.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list[int]</span>
+<span class="sd">            The number of neurons in consecutive fully connected layers of the common part of the network</span>
+<span class="sd">            (internal representation of the simultaneous extraction network).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_shared_neurons</span></div>
+
+<div class="viewcode-block" id="SimultaneousMappingNet.get_num_output_neurons"><a class="viewcode-back" href="../../../modules.html#revelionn.mapping_nets.simultaneous_mapping_net.SimultaneousMappingNet.get_num_output_neurons">[docs]</a>    <span class="k">def</span> <span class="nf">get_num_output_neurons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the number of output neurons.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list[int]</span>
+<span class="sd">            The number of neurons in consecutive fully connected layers of each of the concept blocks.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_output_neurons</span></div>
+
+<div class="viewcode-block" id="SimultaneousMappingNet.get_num_outs"><a class="viewcode-back" href="../../../modules.html#revelionn.mapping_nets.simultaneous_mapping_net.SimultaneousMappingNet.get_num_outs">[docs]</a>    <span class="k">def</span> <span class="nf">get_num_outs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the number of outputs of the simultaneous extraction network.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            The number of outputs of the simultaneous extraction network.</span>
+<span class="sd">            It is determined by the number of extracted concepts.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_outs</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RevelioNN authors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

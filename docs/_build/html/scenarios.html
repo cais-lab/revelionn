@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Usage Scenarios &mdash; RevelioNN  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Advanced Usage" href="advanced_usage.html" />
+    <link rel="prev" title="Introduction" href="intro.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            RevelioNN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage Scenarios</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#script-only">Script-Only</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#program-level">Program-Level</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_usage.html">Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">RevelioNN Modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RevelioNN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Usage Scenarios</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/scenarios.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="usage-scenarios">
+<h1>Usage Scenarios<a class="headerlink" href="#usage-scenarios" title="Permalink to this heading"></a></h1>
+<section id="script-only">
+<h2>Script-Only<a class="headerlink" href="#script-only" title="Permalink to this heading"></a></h2>
+<p>This scenario basically does not require programming and reveals only the basic capabilities of the library.</p>
+<p>To use it, the appropriate environment must be initialized (see <a class="reference external" href="intro.html#installation">Installation</a>). Further, being in the terminal in the project
+directory in a prepared virtual environment, you can interact with RevelioNN through the following scripts.</p>
+<ul class="simple">
+<li><p>Converting a pre-trained model to the RevelioNN format</p></li>
+</ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python convert_to_rvl_format.py &lt;model_filepath&gt; &lt;main_net_module_name&gt; &lt;main_net_class&gt; &lt;transformation_name&gt; &lt;img_size_name&gt; &lt;num_channels_name&gt; &lt;rvl_filename&gt; &lt;class_label&gt;
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Printing a dictionary of layers of the main neural network</p></li>
+</ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python print_layers_dict.py &lt;module_name&gt; &lt;main_net_class&gt; -l &lt;layer_types&gt;
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Training of the main networks</p></li>
+</ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python train_main_nets.py &lt;module_name&gt; &lt;main_net_class&gt; &lt;transformation_name&gt; &lt;img_size_name&gt; &lt;num_channels_name&gt; &lt;path_to_images&gt; &lt;path_to_train_csv&gt; &lt;path_to_valid_csv&gt; &lt;image_names_column&gt; -l &lt;label_columns&gt; -d &lt;device&gt;
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Evaluation of the main networks</p></li>
+</ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python evaluate_main_nets.py &lt;path_to_images&gt; &lt;path_to_test_csv&gt; &lt;image_names_column&gt; -m &lt;main_model_filenames&gt; -d &lt;device&gt;
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Training a single mapping network</p></li>
+</ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python train_single_mapping_net.py &lt;main_model_filename&gt; &lt;path_to_images&gt; &lt;path_to_train_csv&gt; &lt;path_to_valid_csv&gt; &lt;image_names_column&gt; &lt;label_column&gt; --layers_types &lt;layer_types&gt; --layers &lt;layers&gt; --num_neurons &lt;num_neurons&gt; -d &lt;device&gt;
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Training a simultaneous mapping network</p></li>
+</ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python train_simultaneous_mapping_net.py &lt;main_model_filename&gt; &lt;path_to_images&gt; &lt;path_to_train_csv&gt; &lt;path_to_valid_csv&gt; &lt;image_names_column&gt; --label_columns &lt;label_columns&gt; --layers_types &lt;layer_types&gt; --decoder_channels &lt;decoder_channels&gt; --num_shared_neurons &lt;num_shared_neurons&gt; --num_output_neurons &lt;num_output_neurons&gt; -d &lt;device&gt;
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Evaluation of the mapping network</p></li>
+</ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python evaluate_mapping_net.py &lt;path_to_images&gt; &lt;path_to_test_csv&gt; &lt;image_names_column&gt; -m &lt;mapping_model_filename&gt; -d &lt;device&gt;
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Extracting concepts from an image</p></li>
+</ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python extract_concepts_from_image.py &lt;path_to_img&gt; -m &lt;mapping_model_filenames&gt; -d &lt;device&gt;
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Formation of logical explanations based on ontology</p></li>
+</ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python form_logical_explanations.py &lt;path_to_img&gt; &lt;path_to_ontology&gt; &lt;concepts_map_module_name&gt; &lt;concepts_map_name&gt; &lt;main_concept&gt; -m &lt;mapping_model_filenames&gt; -d &lt;device&gt;
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Formation of visual explanations</p></li>
+</ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python form_visual_explanations.py &lt;path_to_img&gt; &lt;mapping_model_filename&gt; --window_size &lt;window_size&gt; --stride &lt;stride&gt;
+</pre></div>
+</div>
+<p>To get detailed information on each of the scripts, you need to run:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python &lt;script_name&gt;.py --help
+</pre></div>
+</div>
+</section>
+<section id="program-level">
+<h2>Program-Level<a class="headerlink" href="#program-level" title="Permalink to this heading"></a></h2>
+<p>To use the API, follow these steps:</p>
+<ol class="arabic">
+<li><p>Import <code class="docutils literal notranslate"><span class="pre">convert_to_rvl_format()</span></code> function:</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">revelionn.utils.model</span> <span class="kn">import</span> <span class="n">convert_to_rvl_format</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>Call this function by passing the data of the previously declared network model as parameters:</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">convert_to_rvl_format</span><span class="p">(</span><span class="n">main_model</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">class_label</span><span class="p">,</span> <span class="n">module_name</span><span class="p">,</span> <span class="n">main_net_class</span><span class="p">,</span> <span class="n">transformation_name</span><span class="p">,</span> <span class="n">img_size</span><span class="p">,</span> <span class="n">num_channels</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Import <code class="docutils literal notranslate"><span class="pre">MappingTrainer</span></code> class:</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">revelionn.mapping_trainer</span> <span class="kn">import</span> <span class="n">MappingTrainer</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Initialize the MappingTrainer object and define a list of layer types to be identified in the convolutional network.
+It provides a training/evaluation interface:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">MappingTrainer.train_single_model()</span></code> trains a single mapping network for a given concept based on the activations of given layers;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MappingTrainer.train_simultaneous_model()</span></code> trains a simultaneous mapping network for a given set of concepts based on the activations of layers of previously defined types;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MappingTrainer.train_simultaneous_model_semisupervised()</span></code> trains a simultaneous mapping network for a given set of concepts using semi-supervised learning, in which a semantic loss is calculated for unlabeled samples, taking into account the relationships between the concepts;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MappingTrainer.evaluate_model()</span></code> evaluates the mapping network model on the test set using the ROC AUC.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Once the mapping network is trained, you can form logical and visual explanations. To do this, you must first load
+the trained network model via <code class="docutils literal notranslate"><span class="pre">load_mapping_model()</span></code>.</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">revelionn.utils.model</span> <span class="kn">import</span> <span class="n">load_mapping_model</span>
+
+<span class="n">main_module</span><span class="p">,</span> <span class="n">mapping_module</span><span class="p">,</span> <span class="n">activation_extractor</span><span class="p">,</span> <span class="n">transformation</span><span class="p">,</span> <span class="n">img_size</span> <span class="o">=</span>
+<span class="n">load_mapping_model</span><span class="p">(</span><span class="n">mapping_model_filepath</span><span class="p">,</span> <span class="n">main_models_directory</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>To form logical explanations using an ontology, one must first extract the concepts relevant to the target concept
+from the image, and then transfer the extracted concepts and their probabilities to the reasoning module along with the
+ontology. This can be done as follows:</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">revelionn.utils.explanation</span> <span class="kn">import</span> <span class="n">extract_concepts_from_img</span><span class="p">,</span> <span class="n">explain_target_concept</span>
+
+<span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">image_path</span><span class="p">)</span>
+<span class="n">main_concepts</span><span class="p">,</span> <span class="n">extracted_concepts</span><span class="p">,</span> <span class="n">mapping_probabilities</span> <span class="o">=</span> <span class="n">extract_concepts_from_img</span><span class="p">(</span><span class="n">main_module</span><span class="p">,</span>
+                                                                                  <span class="n">mapping_module</span><span class="p">,</span>
+                                                                                  <span class="n">image</span><span class="p">,</span>
+                                                                                  <span class="n">transformation</span><span class="p">)</span>
+<span class="n">justifications</span> <span class="o">=</span> <span class="n">explain_target_concept</span><span class="p">(</span><span class="n">extracted_concepts</span><span class="p">,</span> <span class="n">mapping_probabilities</span><span class="p">,</span> <span class="n">concepts_map</span><span class="p">,</span> <span class="n">target_concept</span><span class="p">,</span>
+                                     <span class="n">jar_filepath</span><span class="p">,</span> <span class="n">owl_ontology</span><span class="p">,</span> <span class="n">temp_files_path</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">justifications</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Visual explanations can be formed as follows:</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">revelionn.occlusion</span> <span class="kn">import</span> <span class="n">perform_occlusion</span>
+
+<span class="n">perform_occlusion</span><span class="p">(</span><span class="n">main_module</span><span class="p">,</span> <span class="n">mapping_module</span><span class="p">,</span> <span class="n">activation_extractor</span><span class="p">,</span> <span class="n">transformation</span><span class="p">,</span> <span class="n">img_size</span><span class="p">,</span>
+               <span class="n">image_path</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="n">stride</span><span class="p">,</span> <span class="n">threads</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ol>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="intro.html" class="btn btn-neutral float-left" title="Introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="advanced_usage.html" class="btn btn-neutral float-right" title="Advanced Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RevelioNN authors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

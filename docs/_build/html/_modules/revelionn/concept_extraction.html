@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>revelionn.concept_extraction &mdash; RevelioNN  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            RevelioNN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scenarios.html">Usage Scenarios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced_usage.html">Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">RevelioNN Modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">RevelioNN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">revelionn.concept_extraction</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for revelionn.concept_extraction</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">from</span> <span class="nn">semantic_loss_pytorch</span> <span class="kn">import</span> <span class="n">SemanticLoss</span>
+
+
+<div class="viewcode-block" id="ConceptExtractor"><a class="viewcode-back" href="../../modules.html#revelionn.concept_extraction.ConceptExtractor">[docs]</a><span class="k">class</span> <span class="nc">ConceptExtractor</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class that provides concept extraction algorithms.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ontology : nxontology.NXOntology</span>
+<span class="sd">        Ontology represented as a graph, where edge direction goes from superterm to subterm.</span>
+<span class="sd">    trainer : MappingTrainer</span>
+<span class="sd">        An instance of the MappingTrainer class that provides an interface for training mapping networks.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    create_subgraph(graph, node)</span>
+<span class="sd">        Returns a subgraph containing all child nodes for a given, including this one.</span>
+<span class="sd">    order_concepts(target_concept, ontology)</span>
+<span class="sd">        Performs topological sorting of a subgraph formed by a given parent node (target concept).</span>
+<span class="sd">    exhaustive_search(concept, layer_names, mapping_neurons)</span>
+<span class="sd">        Trains and evaluates mapping networks based on the activations of each of the specified layers of the network.</span>
+<span class="sd">    linear_search(concept, top_layer_num, patience_layers, mapping_neurons)</span>
+<span class="sd">        Trains and evaluates mapping networks based on the activations of each of the layers starting from the</span>
+<span class="sd">        specified one, until the value of the quality metric deteriorates over several layers (the value of patience).</span>
+<span class="sd">    heuristic_search(target_concept, top_layer_num, patience_layers, mapping_neurons)</span>
+<span class="sd">        Due to the heuristic reduction of the set of specified layers, mapping networks are not trained for every</span>
+<span class="sd">        combination of layer-concept. Uses linear search.</span>
+<span class="sd">    simultaneous_extraction(target_concept, decoder_channels, num_shared_neurons, num_output_neurons,</span>
+<span class="sd">                            sdd_path=None, vtree_path=None, sem_loss_weight=None, unlabeled_samples=None)</span>
+<span class="sd">        Trains a mapping network that can simultaneously extract a set of relevant concepts from the entire set of</span>
+<span class="sd">        layers of specified types (the types are set when initializing the MappingTrainer instance).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mapping_trainer</span><span class="p">,</span> <span class="n">nxonto</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets all the necessary attributes for the ConceptExtractor object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mapping_trainer : MappingTrainer</span>
+<span class="sd">            An instance of the MappingTrainer class that provides an interface for training mapping networks.</span>
+<span class="sd">        nxonto : nxontology.NXOntology</span>
+<span class="sd">            Ontology represented as a graph, where edge direction goes from superterm to subterm.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ontology</span> <span class="o">=</span> <span class="n">nxonto</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span> <span class="o">=</span> <span class="n">mapping_trainer</span>
+
+<div class="viewcode-block" id="ConceptExtractor.create_subgraph"><a class="viewcode-back" href="../../modules.html#revelionn.concept_extraction.ConceptExtractor.create_subgraph">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">create_subgraph</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a subgraph containing all child nodes for a given node, including the given node.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        graph : networkx.Graph</span>
+<span class="sd">            The graph from which to extract the subgraph.</span>
+<span class="sd">        node : str</span>
+<span class="sd">            The node for which to create the subgraph.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        networkx.Graph</span>
+<span class="sd">            A subgraph of `graph` containing all child nodes of `node`, including `node`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">edges</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">dfs_successors</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">edges</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">nodes</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">k</span><span class="p">])</span>
+            <span class="n">nodes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">graph</span><span class="o">.</span><span class="n">subgraph</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConceptExtractor.order_concepts"><a class="viewcode-back" href="../../modules.html#revelionn.concept_extraction.ConceptExtractor.order_concepts">[docs]</a>    <span class="k">def</span> <span class="nf">order_concepts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_concept</span><span class="p">,</span> <span class="n">ontology</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs topological sorting of a subgraph formed by a given parent node (target concept).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        target_concept : str</span>
+<span class="sd">            The target concept node for which to perform topological sorting.</span>
+<span class="sd">        ontology : nxontology.NXOntology</span>
+<span class="sd">            The ontology graph.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A list of concepts in topologically sorted order within the subgraph.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">subgraph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_subgraph</span><span class="p">(</span><span class="n">ontology</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">target_concept</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">topological_sort</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">line_graph</span><span class="p">(</span><span class="n">subgraph</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="ConceptExtractor.exhaustive_search"><a class="viewcode-back" href="../../modules.html#revelionn.concept_extraction.ConceptExtractor.exhaustive_search">[docs]</a>    <span class="k">def</span> <span class="nf">exhaustive_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concept</span><span class="p">,</span> <span class="n">layer_names</span><span class="p">,</span> <span class="n">mapping_neurons</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Trains and evaluates mapping networks based on the activations of each of the specified layers of the network.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        concept : str</span>
+<span class="sd">            The concept for which to perform the search.</span>
+<span class="sd">        layer_names : list</span>
+<span class="sd">            A list of layer names to consider for training and evaluation.</span>
+<span class="sd">        mapping_neurons : list[int]</span>
+<span class="sd">            The number of neurons in the mapping network.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            A dict containing the best layer name and the corresponding evaluation value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">best_value</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">best_layer</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">layer_name</span> <span class="ow">in</span> <span class="n">layer_names</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">train_single_model</span><span class="p">(</span><span class="n">mapping_neurons</span><span class="p">,</span> <span class="n">concept</span><span class="p">,</span> <span class="p">[</span><span class="n">layer_name</span><span class="p">])</span>
+            <span class="n">cur_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">evaluate_model</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">best_value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">cur_value</span> <span class="o">&gt;</span> <span class="n">best_value</span><span class="p">:</span>
+                <span class="n">best_value</span> <span class="o">=</span> <span class="n">cur_value</span>
+                <span class="n">best_layer</span> <span class="o">=</span> <span class="n">layer_name</span>
+
+        <span class="k">return</span> <span class="n">best_layer</span><span class="p">,</span> <span class="n">best_value</span></div>
+
+<div class="viewcode-block" id="ConceptExtractor.linear_search"><a class="viewcode-back" href="../../modules.html#revelionn.concept_extraction.ConceptExtractor.linear_search">[docs]</a>    <span class="k">def</span> <span class="nf">linear_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concept</span><span class="p">,</span> <span class="n">top_layer_num</span><span class="p">,</span> <span class="n">patience_layers</span><span class="p">,</span> <span class="n">mapping_neurons</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Trains and evaluates mapping networks based on the activations of each of the layers starting from the</span>
+<span class="sd">        specified one, until the value of the quality metric deteriorates over several layers (the value of patience).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        concept : str</span>
+<span class="sd">            The concept for which to perform the search.</span>
+<span class="sd">        top_layer_num : int</span>
+<span class="sd">            The starting layer number for training and evaluation.</span>
+<span class="sd">        patience_layers : int</span>
+<span class="sd">            The number of layers to tolerate deterioration in the quality metric.</span>
+<span class="sd">        mapping_neurons : list[int]</span>
+<span class="sd">            The number of neurons in the mapping network.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple</span>
+<span class="sd">            A tuple containing the best layer number and the corresponding evaluation value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">best_layer_num</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">best_value</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">cur_layer_num</span> <span class="o">=</span> <span class="n">top_layer_num</span>
+        <span class="k">while</span> <span class="n">cur_layer_num</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">train_single_model</span><span class="p">(</span><span class="n">mapping_neurons</span><span class="p">,</span> <span class="n">concept</span><span class="p">,</span> <span class="p">[</span><span class="n">cur_layer_num</span><span class="p">])</span>
+            <span class="n">cur_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">evaluate_model</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">best_value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">cur_value</span> <span class="o">&gt;</span> <span class="n">best_value</span><span class="p">:</span>
+                <span class="n">best_value</span> <span class="o">=</span> <span class="n">cur_value</span>
+                <span class="n">best_layer_num</span> <span class="o">=</span> <span class="n">cur_layer_num</span>
+            <span class="k">if</span> <span class="n">best_layer_num</span> <span class="o">-</span> <span class="n">cur_layer_num</span> <span class="o">&gt;</span> <span class="n">patience_layers</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">cur_layer_num</span> <span class="o">-=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">best_layer_num</span><span class="p">,</span> <span class="n">best_value</span></div>
+
+<div class="viewcode-block" id="ConceptExtractor.heuristic_search"><a class="viewcode-back" href="../../modules.html#revelionn.concept_extraction.ConceptExtractor.heuristic_search">[docs]</a>    <span class="k">def</span> <span class="nf">heuristic_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_concept</span><span class="p">,</span> <span class="n">top_layer_num</span><span class="p">,</span> <span class="n">patience_layers</span><span class="p">,</span> <span class="n">mapping_neurons</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Due to the heuristic reduction of the set of specified layers, mapping networks are not trained for every</span>
+<span class="sd">        combination of layer-concept. Uses linear search.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        target_concept : str</span>
+<span class="sd">            The target concept that should be obtained by ontological inference.</span>
+<span class="sd">            Mapping networks are trained to extract concepts relevant to the target concept.</span>
+<span class="sd">        top_layer_num : int</span>
+<span class="sd">            The starting layer number for training and evaluation.</span>
+<span class="sd">        patience_layers : int</span>
+<span class="sd">            The number of layers to tolerate deterioration in the quality metric.</span>
+<span class="sd">        mapping_neurons : list[int]</span>
+<span class="sd">            The number of neurons in the mapping network.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            A dictionary containing the best layer number and evaluation value for each concept in the subgraph.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">ordered_concepts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_concepts</span><span class="p">(</span><span class="n">target_concept</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ontology</span><span class="p">)</span>
+        <span class="n">best_layers</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">parent</span><span class="p">,</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">ordered_concepts</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">parent</span> <span class="o">==</span> <span class="n">target_concept</span><span class="p">:</span>
+                <span class="n">initial_layer</span> <span class="o">=</span> <span class="n">top_layer_num</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">initial_layer</span> <span class="o">=</span> <span class="n">best_layers</span><span class="p">[</span><span class="n">parent</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">layer_num</span><span class="p">,</span> <span class="n">auc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_search</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">initial_layer</span><span class="p">,</span> <span class="n">patience_layers</span><span class="p">,</span> <span class="n">mapping_neurons</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">child</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">best_layers</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">best_layers</span><span class="p">[</span><span class="n">child</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">layer_num</span><span class="p">,</span> <span class="n">auc</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">auc</span> <span class="o">&gt;</span> <span class="n">best_layers</span><span class="p">[</span><span class="n">child</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">best_layers</span><span class="p">[</span><span class="n">child</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">layer_num</span><span class="p">,</span> <span class="n">auc</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">best_layers</span></div>
+
+<div class="viewcode-block" id="ConceptExtractor.simultaneous_extraction"><a class="viewcode-back" href="../../modules.html#revelionn.concept_extraction.ConceptExtractor.simultaneous_extraction">[docs]</a>    <span class="k">def</span> <span class="nf">simultaneous_extraction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_concept</span><span class="p">,</span> <span class="n">decoder_channels</span><span class="p">,</span> <span class="n">num_shared_neurons</span><span class="p">,</span> <span class="n">num_output_neurons</span><span class="p">,</span>
+                                <span class="n">sdd_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vtree_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sem_loss_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">unlabeled_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        target_concept : str</span>
+<span class="sd">            The target concept that should be obtained by ontological inference.</span>
+<span class="sd">            Mapping networks are trained to extract concepts relevant to the target concept.</span>
+<span class="sd">        decoder_channels : int</span>
+<span class="sd">            The number of decoder channels. The output number of channels of the convolutional layer of the decoder or</span>
+<span class="sd">            the output number of neurons of the decoder of the fully connected layer.</span>
+<span class="sd">        num_shared_neurons : list[int]</span>
+<span class="sd">            The number of neurons in consecutive fully connected layers of the common part of the network</span>
+<span class="sd">            (internal representation of the simultaneous extraction network).</span>
+<span class="sd">        num_output_neurons : list[int]</span>
+<span class="sd">            The number of neurons in consecutive fully connected layers of each of the concept blocks.</span>
+<span class="sd">        sdd_path : str</span>
+<span class="sd">            The path to the .sdd file.</span>
+<span class="sd">        vtree_path : str</span>
+<span class="sd">            The path to the .vtree file.</span>
+<span class="sd">        sem_loss_weight : float</span>
+<span class="sd">            The contribution of semantic loss to the overall loss function.</span>
+<span class="sd">        unlabeled_samples : int or float</span>
+<span class="sd">            The number of unlabeled samples to include. If float, it represents the fraction of unlabeled samples.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        concepts_auc : list[float]</span>
+<span class="sd">            ROC AUC values for each of the concepts.</span>
+<span class="sd">        all_auc : float</span>
+<span class="sd">            ROC AUC value for all labels of a simultaneous mapping network.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">concepts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_subgraph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ontology</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">target_concept</span><span class="p">)</span>
+        <span class="n">concepts</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">target_concept</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">sdd_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">train_simultaneous_model</span><span class="p">(</span><span class="n">concepts</span><span class="p">,</span> <span class="n">decoder_channels</span><span class="p">,</span> <span class="n">num_shared_neurons</span><span class="p">,</span>
+                                                  <span class="n">num_output_neurons</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sl</span> <span class="o">=</span> <span class="n">SemanticLoss</span><span class="p">(</span><span class="n">sdd_path</span><span class="p">,</span> <span class="n">vtree_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">train_simultaneous_model_semisupervised</span><span class="p">(</span><span class="n">concepts</span><span class="p">,</span> <span class="n">decoder_channels</span><span class="p">,</span> <span class="n">num_shared_neurons</span><span class="p">,</span>
+                                                                 <span class="n">num_output_neurons</span><span class="p">,</span> <span class="n">sl</span><span class="p">,</span> <span class="n">sem_loss_weight</span><span class="p">,</span>
+                                                                 <span class="n">unlabeled_samples</span><span class="p">)</span>
+        <span class="n">concepts_auc</span><span class="p">,</span> <span class="n">all_auc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">evaluate_model</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">concepts_auc</span><span class="p">,</span> <span class="n">all_auc</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RevelioNN authors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

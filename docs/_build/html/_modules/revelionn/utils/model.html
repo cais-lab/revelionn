@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>revelionn.utils.model &mdash; RevelioNN  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            RevelioNN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../scenarios.html">Usage Scenarios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_usage.html">Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">RevelioNN Modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">RevelioNN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">revelionn.utils.model</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for revelionn.utils.model</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">revelionn.activation_extraction</span> <span class="kn">import</span> <span class="n">ActivationExtractor</span>
+<span class="kn">from</span> <span class="nn">revelionn.main_module</span> <span class="kn">import</span> <span class="n">MainModelProcessing</span>
+<span class="kn">from</span> <span class="nn">revelionn.mapping_module</span> <span class="kn">import</span> <span class="n">MappingModelProcessing</span>
+<span class="kn">from</span> <span class="nn">revelionn.mapping_nets.simultaneous_mapping_net</span> <span class="kn">import</span> <span class="n">SimultaneousMappingNet</span>
+<span class="kn">from</span> <span class="nn">revelionn.mapping_nets.single_mapping_net</span> <span class="kn">import</span> <span class="n">SingleMappingNet</span>
+
+
+<div class="viewcode-block" id="convert_to_rvl_format"><a class="viewcode-back" href="../../../modules.html#revelionn.utils.model.convert_to_rvl_format">[docs]</a><span class="k">def</span> <span class="nf">convert_to_rvl_format</span><span class="p">(</span><span class="n">main_model</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">class_label</span><span class="p">,</span> <span class="n">module_name</span><span class="p">,</span> <span class="n">main_net_class</span><span class="p">,</span>
+                          <span class="n">transformation_name</span><span class="p">,</span> <span class="n">img_size</span><span class="p">,</span> <span class="n">num_channels</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts the pre-trained main network model to RevelioNN format. Creates the converted model as an RVL file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    main_model : torch.nn.Module</span>
+<span class="sd">        Main network model with loaded weights.</span>
+<span class="sd">    filename : str</span>
+<span class="sd">        Filename (path) to save the converted model.</span>
+<span class="sd">    class_label : str</span>
+<span class="sd">        Name of the output class label of the main network.</span>
+<span class="sd">    module_name : str</span>
+<span class="sd">        Name of the module (.py file name) containing the class of the main network.</span>
+<span class="sd">    main_net_class : str</span>
+<span class="sd">        Name of the main network class.</span>
+<span class="sd">    transformation_name : str</span>
+<span class="sd">        Name of the variable storing transformations.</span>
+<span class="sd">    img_size : int</span>
+<span class="sd">        Size of the image side.</span>
+<span class="sd">    num_channels : int</span>
+<span class="sd">        Number of image channels.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">classes</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="n">class_label</span><span class="p">,</span>
+               <span class="mi">0</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;Not</span><span class="si">{</span><span class="n">class_label</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">}</span>
+
+    <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">({</span><span class="s1">&#39;classes&#39;</span><span class="p">:</span> <span class="n">classes</span><span class="p">,</span>
+                <span class="s1">&#39;model_state_dict&#39;</span><span class="p">:</span> <span class="n">main_model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
+                <span class="s1">&#39;main_net_module_name&#39;</span><span class="p">:</span> <span class="n">module_name</span><span class="p">,</span>
+                <span class="s1">&#39;main_net_class&#39;</span><span class="p">:</span> <span class="n">main_net_class</span><span class="p">,</span>
+                <span class="s1">&#39;transformation_name&#39;</span><span class="p">:</span> <span class="n">transformation_name</span><span class="p">,</span>
+                <span class="s1">&#39;img_size&#39;</span><span class="p">:</span> <span class="n">img_size</span><span class="p">,</span>
+                <span class="s1">&#39;num_channels&#39;</span><span class="p">:</span> <span class="n">num_channels</span>
+                <span class="p">},</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">.rvl&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="load_main_model"><a class="viewcode-back" href="../../../modules.html#revelionn.utils.model.load_main_model">[docs]</a><span class="k">def</span> <span class="nf">load_main_model</span><span class="p">(</span><span class="n">main_model_filepath</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loads the main network model in RevelioNN format from a file. Initializes and returns a class to work with</span>
+<span class="sd">    the main net, as well as a transformation object and image size.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    main_model_filepath : str</span>
+<span class="sd">        File path containing the parameters of the main network model.</span>
+<span class="sd">    device : torch.device</span>
+<span class="sd">        Tensor processing device.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    main_module : MainModelProcessing</span>
+<span class="sd">        Class for training, evaluation and processing the main network model.</span>
+<span class="sd">    transformation : torchvision.transforms</span>
+<span class="sd">        A transform to apply to the images.</span>
+<span class="sd">    img_size : int</span>
+<span class="sd">        Size of the image side.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">main_net_data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">main_model_filepath</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">main_net_module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;main_net_classes.&quot;</span>
+                                              <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">main_net_data</span><span class="p">[</span><span class="s1">&#39;main_net_module_name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">main_net</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">main_net_module</span><span class="p">,</span> <span class="n">main_net_data</span><span class="p">[</span><span class="s1">&#39;main_net_class&#39;</span><span class="p">])()</span>
+    <span class="n">main_module</span> <span class="o">=</span> <span class="n">MainModelProcessing</span><span class="p">(</span><span class="n">main_net</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+    <span class="n">main_module</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">main_model_filepath</span><span class="p">)</span>
+
+    <span class="n">img_size</span> <span class="o">=</span> <span class="n">main_net_data</span><span class="p">[</span><span class="s1">&#39;img_size&#39;</span><span class="p">]</span>
+    <span class="n">transformation</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">main_net_module</span><span class="p">,</span> <span class="n">main_net_data</span><span class="p">[</span><span class="s1">&#39;transformation_name&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">main_module</span><span class="p">,</span> <span class="n">transformation</span><span class="p">,</span> <span class="n">img_size</span></div>
+
+
+<div class="viewcode-block" id="load_mapping_model"><a class="viewcode-back" href="../../../modules.html#revelionn.utils.model.load_mapping_model">[docs]</a><span class="k">def</span> <span class="nf">load_mapping_model</span><span class="p">(</span><span class="n">mapping_model_filepath</span><span class="p">,</span> <span class="n">main_models_directory</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loads the mapping network model from a file. Initializes and returns a class to work with the main net,</span>
+<span class="sd">    as well as a transformation object and image size.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mapping_model_filepath : str</span>
+<span class="sd">        File path containing the parameters of the mapping network model.</span>
+<span class="sd">    main_models_directory : str</span>
+<span class="sd">        The directory containing the .py files in which the main network classes are defined.</span>
+<span class="sd">    device : torch.device</span>
+<span class="sd">        Tensor processing device.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    main_module : MainModelProcessing</span>
+<span class="sd">        Class for training, evaluation and processing the main network model.</span>
+<span class="sd">    mapping_module : MappingModelProcessing</span>
+<span class="sd">        Class for training, evaluation and processing the mapping network model.</span>
+<span class="sd">    activation_extractor : ActivationExtractor</span>
+<span class="sd">        Class for identifying layers of the main network and for extracting activations produced during</span>
+<span class="sd">        network inference.</span>
+<span class="sd">    transformation : torchvision.transforms</span>
+<span class="sd">        A transform to apply to the images.</span>
+<span class="sd">    img_size : int</span>
+<span class="sd">        Size of the image side.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">mapping_model_data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">mapping_model_filepath</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">main_module</span><span class="p">,</span> <span class="n">transformation</span><span class="p">,</span> <span class="n">img_size</span> <span class="o">=</span> <span class="n">load_main_model</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">main_models_directory</span><span class="p">,</span>
+                                                                         <span class="n">mapping_model_data</span><span class="p">[</span><span class="s1">&#39;main_model_filename&#39;</span><span class="p">]),</span>
+                                                            <span class="n">device</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s1">&#39;decoder_channels&#39;</span> <span class="ow">in</span> <span class="n">mapping_model_data</span><span class="p">:</span>
+        <span class="n">activation_extractor</span> <span class="o">=</span> <span class="n">ActivationExtractor</span><span class="p">(</span><span class="n">main_module</span><span class="p">,</span> <span class="n">mapping_model_data</span><span class="p">[</span><span class="s1">&#39;layers_types&#39;</span><span class="p">],</span>
+                                                   <span class="n">is_concatenate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">activation_extractor</span><span class="o">.</span><span class="n">set_layers_for_research</span><span class="p">(</span><span class="n">mapping_model_data</span><span class="p">[</span><span class="s1">&#39;layers&#39;</span><span class="p">])</span>
+        <span class="n">mapping_net</span> <span class="o">=</span> <span class="n">SimultaneousMappingNet</span><span class="p">(</span><span class="n">activation_extractor</span><span class="p">,</span>
+                                             <span class="n">mapping_model_data</span><span class="p">[</span><span class="s1">&#39;decoder_channels&#39;</span><span class="p">],</span>
+                                             <span class="n">mapping_model_data</span><span class="p">[</span><span class="s1">&#39;num_shared_neurons&#39;</span><span class="p">],</span>
+                                             <span class="n">mapping_model_data</span><span class="p">[</span><span class="s1">&#39;num_output_neurons&#39;</span><span class="p">],</span>
+                                             <span class="n">mapping_model_data</span><span class="p">[</span><span class="s1">&#39;num_outs&#39;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">activation_extractor</span> <span class="o">=</span> <span class="n">ActivationExtractor</span><span class="p">(</span><span class="n">main_module</span><span class="p">,</span> <span class="n">mapping_model_data</span><span class="p">[</span><span class="s1">&#39;layers_types&#39;</span><span class="p">],</span> <span class="n">is_concatenate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">activation_extractor</span><span class="o">.</span><span class="n">set_layers_for_research</span><span class="p">(</span><span class="n">mapping_model_data</span><span class="p">[</span><span class="s1">&#39;layers&#39;</span><span class="p">])</span>
+        <span class="n">mapping_net</span> <span class="o">=</span> <span class="n">SingleMappingNet</span><span class="p">(</span><span class="n">activation_extractor</span><span class="o">.</span><span class="n">count_num_activations</span><span class="p">(</span><span class="n">mapping_model_data</span><span class="p">[</span><span class="s1">&#39;num_channels&#39;</span><span class="p">],</span>
+                                                                                  <span class="n">mapping_model_data</span><span class="p">[</span><span class="s1">&#39;img_size&#39;</span><span class="p">],</span>
+                                                                                  <span class="n">mapping_model_data</span><span class="p">[</span><span class="s1">&#39;img_size&#39;</span><span class="p">]),</span>
+                                       <span class="n">mapping_model_data</span><span class="p">[</span><span class="s1">&#39;num_neurons_list&#39;</span><span class="p">])</span>
+    <span class="n">mapping_module</span> <span class="o">=</span> <span class="n">MappingModelProcessing</span><span class="p">(</span><span class="n">activation_extractor</span><span class="p">,</span> <span class="n">mapping_net</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+    <span class="n">mapping_module</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">mapping_model_filepath</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">main_module</span><span class="p">,</span> <span class="n">mapping_module</span><span class="p">,</span> <span class="n">activation_extractor</span><span class="p">,</span> <span class="n">transformation</span><span class="p">,</span> <span class="n">img_size</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RevelioNN authors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,337 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#"
+     xml:base="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#has -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#has">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Combination"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Figure"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#C1 -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#C1">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#EllStar"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#HexStar"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#TEStarmarker"/>
+                </owl:unionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#C2 -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#C2">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#PentaTripod"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#RSStarmarker"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#StarTripod"/>
+                </owl:unionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Combination -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Combination">
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Figure"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#EllStar -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#EllStar">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Combination"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Ellipse -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Ellipse">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Figure"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Figure -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Figure"/>
+    
+
+
+    <!-- http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#HexStar -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#HexStar">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Combination"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Hexagon -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Hexagon">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Figure"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#PentaTripod -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#PentaTripod">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Combination"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Pentagon -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Pentagon">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Figure"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#RSStarmarker -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#RSStarmarker">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Combination"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Rectangle -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Rectangle">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Figure"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Star -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Star">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Figure"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#StarTripod -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#StarTripod">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Combination"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Starmarker -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Starmarker">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Figure"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#TEStarmarker -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#TEStarmarker">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Combination"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Triangle -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Triangle">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Figure"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Tripod -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Tripod">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Figure"/>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#__input__ -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#__input__"/>
+    
+
+
+    <!-- http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#t1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#t1">
+        <rdf:type>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#has"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Hexagon"/>
+            </owl:Restriction>
+        </rdf:type>
+        <rdf:type>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#has"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Star"/>
+            </owl:Restriction>
+        </rdf:type>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // General axioms
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <owl:Class>
+        <owl:intersectionOf rdf:parseType="Collection">
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#has"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Ellipse"/>
+            </owl:Restriction>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#has"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Star"/>
+            </owl:Restriction>
+        </owl:intersectionOf>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#EllStar"/>
+    </owl:Class>
+    <owl:Class>
+        <owl:intersectionOf rdf:parseType="Collection">
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#has"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Ellipse"/>
+            </owl:Restriction>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#has"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Starmarker"/>
+            </owl:Restriction>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#has"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Triangle"/>
+            </owl:Restriction>
+        </owl:intersectionOf>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#TEStarmarker"/>
+    </owl:Class>
+    <owl:Class>
+        <owl:intersectionOf rdf:parseType="Collection">
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#has"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Hexagon"/>
+            </owl:Restriction>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#has"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Star"/>
+            </owl:Restriction>
+        </owl:intersectionOf>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#HexStar"/>
+    </owl:Class>
+    <owl:Class>
+        <owl:intersectionOf rdf:parseType="Collection">
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#has"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Pentagon"/>
+            </owl:Restriction>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#has"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Tripod"/>
+            </owl:Restriction>
+        </owl:intersectionOf>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#PentaTripod"/>
+    </owl:Class>
+    <owl:Class>
+        <owl:intersectionOf rdf:parseType="Collection">
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#has"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Rectangle"/>
+            </owl:Restriction>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#has"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Star"/>
+            </owl:Restriction>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#has"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Starmarker"/>
+            </owl:Restriction>
+        </owl:intersectionOf>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#RSStarmarker"/>
+    </owl:Class>
+    <owl:Class>
+        <owl:intersectionOf rdf:parseType="Collection">
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#has"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Star"/>
+            </owl:Restriction>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#has"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#Tripod"/>
+            </owl:Restriction>
+        </owl:intersectionOf>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/aaagafonov/ontologies/2022/8/SCDB#StarTripod"/>
+    </owl:Class>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
+

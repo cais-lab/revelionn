@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>revelionn.datasets &mdash; RevelioNN  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            RevelioNN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scenarios.html">Usage Scenarios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced_usage.html">Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">RevelioNN Modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">RevelioNN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">revelionn.datasets</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for revelionn.datasets</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">torchvision.datasets.folder</span> <span class="kn">import</span> <span class="n">pil_loader</span>
+
+
+<div class="viewcode-block" id="MultiLabeledImagesDataset"><a class="viewcode-back" href="../../modules.html#revelionn.datasets.MultiLabeledImagesDataset">[docs]</a><span class="k">class</span> <span class="nc">MultiLabeledImagesDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A PyTorch dataset class for multi-labeled image data.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    img_labels : pd.DataFrame</span>
+<span class="sd">        A pandas DataFrame containing the image annotations.</span>
+<span class="sd">    img_dir : str</span>
+<span class="sd">        The directory path containing the images.</span>
+<span class="sd">    transform : torchvision.transforms</span>
+<span class="sd">        A transform to apply to the image data.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    __len__()</span>
+<span class="sd">        Returns the total number of samples in the dataset.</span>
+<span class="sd">    __getitem__(idx)</span>
+<span class="sd">        Returns the image and corresponding labels at the given index.</span>
+<span class="sd">    labels()</span>
+<span class="sd">        Returns a list of the target labels.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotations_file</span><span class="p">,</span> <span class="n">img_dir</span><span class="p">,</span> <span class="n">name_column</span><span class="p">,</span> <span class="n">target_columns</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the MultiLabeledImagesDataset.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        annotations_file : str</span>
+<span class="sd">            The file path to the annotations file in CSV format.</span>
+<span class="sd">        img_dir : str</span>
+<span class="sd">            The directory path containing the images.</span>
+<span class="sd">        name_column : str</span>
+<span class="sd">            The name of the column in the annotations file that contains the image names.</span>
+<span class="sd">        target_columns : str or list[str]</span>
+<span class="sd">            The column name(s) of the target labels in the annotations file.</span>
+<span class="sd">        transform : torchvision.transforms</span>
+<span class="sd">            A transform to apply to the image data. Default is None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">img_labels</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">annotations_file</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="p">{</span><span class="n">name_column</span><span class="p">:</span> <span class="nb">str</span><span class="p">})</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target_columns</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">):</span>
+            <span class="n">selected_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">name_column</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">target_columns</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">selected_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">name_column</span><span class="p">,</span> <span class="n">target_columns</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_labels</span><span class="p">[</span><span class="n">selected_columns</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img_dir</span> <span class="o">=</span> <span class="n">img_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="n">transform</span>
+
+<div class="viewcode-block" id="MultiLabeledImagesDataset.__len__"><a class="viewcode-back" href="../../modules.html#revelionn.datasets.MultiLabeledImagesDataset.__len__">[docs]</a>    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the total number of samples in the dataset.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            The total number of samples.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_labels</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MultiLabeledImagesDataset.__getitem__"><a class="viewcode-back" href="../../modules.html#revelionn.datasets.MultiLabeledImagesDataset.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the image and corresponding labels at the given index.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        idx : int</span>
+<span class="sd">            The index of the sample to retrieve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple</span>
+<span class="sd">            A tuple containing the image and corresponding labels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">img_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_labels</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">pil_loader</span><span class="p">(</span><span class="n">img_path</span><span class="p">)</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_labels</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">:</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">image</span><span class="p">,</span> <span class="n">labels</span></div>
+
+<div class="viewcode-block" id="MultiLabeledImagesDataset.labels"><a class="viewcode-back" href="../../modules.html#revelionn.datasets.MultiLabeledImagesDataset.labels">[docs]</a>    <span class="k">def</span> <span class="nf">labels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a list of the target labels.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A list of target labels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_labels</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span></div></div>
+
+
+<div class="viewcode-block" id="SemiSupervisedImagesDataset"><a class="viewcode-back" href="../../modules.html#revelionn.datasets.SemiSupervisedImagesDataset">[docs]</a><span class="k">class</span> <span class="nc">SemiSupervisedImagesDataset</span><span class="p">(</span><span class="n">MultiLabeledImagesDataset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A PyTorch dataset class for semi-supervised multi-labeled image data, inheriting from MultiLabeledImagesDataset.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    img_labels : pd.DataFrame</span>
+<span class="sd">        A pandas DataFrame containing the image annotations.</span>
+<span class="sd">    img_dir : str</span>
+<span class="sd">        The directory path containing the images.</span>
+<span class="sd">    transform : torchvision.transforms</span>
+<span class="sd">        A transform to apply to the image data.</span>
+<span class="sd">    unlabeled_idx : numpy.ndarray</span>
+<span class="sd">        An array containing the indices of unlabeled samples.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    __init__(annotations_file, img_dir, name_column, target_columns, unlabeled_samples, transform=None)</span>
+<span class="sd">        Initialize the SemiSupervisedImagesDataset.</span>
+<span class="sd">    __getitem__(idx)</span>
+<span class="sd">        Get the image, corresponding labels, and unlabeled flag at the given index.</span>
+<span class="sd">    separate_unlabeled(x_raw, y_raw, is_unlabeled)</span>
+<span class="sd">        Separate the labeled and unlabeled samples from the given data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SemiSupervisedImagesDataset.__init__"><a class="viewcode-back" href="../../modules.html#revelionn.datasets.SemiSupervisedImagesDataset.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotations_file</span><span class="p">,</span> <span class="n">img_dir</span><span class="p">,</span> <span class="n">name_column</span><span class="p">,</span> <span class="n">target_columns</span><span class="p">,</span> <span class="n">unlabeled_samples</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the SemiSupervisedImagesDataset.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        annotations_file : str</span>
+<span class="sd">            The file path to the annotations file in CSV format.</span>
+<span class="sd">        img_dir : str</span>
+<span class="sd">            The directory path containing the images.</span>
+<span class="sd">        name_column : str</span>
+<span class="sd">            The name of the column in the annotations file that contains the image names.</span>
+<span class="sd">        target_columns : str or list[str]</span>
+<span class="sd">            The column name(s) of the target labels in the annotations file.</span>
+<span class="sd">        unlabeled_samples : int or float</span>
+<span class="sd">            The number of unlabeled samples to include. If float, it represents the fraction of unlabeled samples.</span>
+<span class="sd">        transform : torchvision.transforms</span>
+<span class="sd">            A transform to apply to the image data. Default is None.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the value of the parameter &#39;unlabeled_samples&#39; is invalid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">annotations_file</span><span class="p">,</span> <span class="n">img_dir</span><span class="p">,</span> <span class="n">name_column</span><span class="p">,</span> <span class="n">target_columns</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">unlabeled_samples</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unlabeled_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_labels</span><span class="p">)))[:</span><span class="n">unlabeled_samples</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">unlabeled_samples</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">and</span> <span class="n">unlabeled_samples</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unlabeled_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_labels</span><span class="p">)))[:</span><span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_labels</span><span class="p">)</span> <span class="o">*</span>
+                                                                                                <span class="n">unlabeled_samples</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid value of the parameter: unlabeled samples.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img_labels</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;Unlabeled&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img_labels</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">unlabeled_idx</span><span class="p">,</span> <span class="s1">&#39;Unlabeled&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="SemiSupervisedImagesDataset.__getitem__"><a class="viewcode-back" href="../../modules.html#revelionn.datasets.SemiSupervisedImagesDataset.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the image, corresponding labels, and unlabeled flag at the given index.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        idx : int</span>
+<span class="sd">            The index of the sample to retrieve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple</span>
+<span class="sd">            A tuple containing the image, corresponding labels, and unlabeled flag.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">img_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_labels</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">pil_loader</span><span class="p">(</span><span class="n">img_path</span><span class="p">)</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_labels</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">))</span>
+        <span class="n">is_unlabeled</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_labels</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">:</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">image</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">is_unlabeled</span></div>
+
+<div class="viewcode-block" id="SemiSupervisedImagesDataset.separate_unlabeled"><a class="viewcode-back" href="../../modules.html#revelionn.datasets.SemiSupervisedImagesDataset.separate_unlabeled">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">separate_unlabeled</span><span class="p">(</span><span class="n">x_raw</span><span class="p">,</span> <span class="n">y_raw</span><span class="p">,</span> <span class="n">is_unlabeled</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Separate the labeled and unlabeled samples from the given data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x_raw : torch.Tensor</span>
+<span class="sd">            The input data.</span>
+<span class="sd">        y_raw : torch.Tensor</span>
+<span class="sd">            The target labels.</span>
+<span class="sd">        is_unlabeled : torch.Tensor</span>
+<span class="sd">            The unlabeled flags indicating whether a sample is labeled (0) or unlabeled (1).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple</span>
+<span class="sd">            A tuple containing the labeled data, labeled target labels, unlabeled data, and unlabeled target labels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">unlabeled_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">is_unlabeled</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">labeled_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">is_unlabeled</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">x_raw</span><span class="p">[</span><span class="n">labeled_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">y_raw</span><span class="p">[</span><span class="n">labeled_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="n">x_unlab</span><span class="p">,</span> <span class="n">y_unlab</span> <span class="o">=</span> <span class="n">x_raw</span><span class="p">[</span><span class="n">unlabeled_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">y_raw</span><span class="p">[</span><span class="n">unlabeled_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x_unlab</span><span class="p">,</span> <span class="n">y_unlab</span></div></div>
+
+
+<div class="viewcode-block" id="create_dataloader"><a class="viewcode-back" href="../../modules.html#revelionn.datasets.create_dataloader">[docs]</a><span class="k">def</span> <span class="nf">create_dataloader</span><span class="p">(</span><span class="n">path_to_csv</span><span class="p">,</span> <span class="n">path_to_images</span><span class="p">,</span> <span class="n">image_names_column</span><span class="p">,</span> <span class="n">target_columns</span><span class="p">,</span>
+                      <span class="n">batch_size</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span> <span class="n">transformation</span><span class="p">,</span> <span class="n">unlabeled_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a PyTorch DataLoader for loading the multi-labeled image dataset.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path_to_csv : str</span>
+<span class="sd">        The file path to the annotations file in CSV format.</span>
+<span class="sd">    path_to_images : str</span>
+<span class="sd">        The directory path containing the images.</span>
+<span class="sd">    image_names_column : str</span>
+<span class="sd">        The name of the column in the annotations file that contains the image names.</span>
+<span class="sd">    target_columns : str or list[str]</span>
+<span class="sd">        The column name(s) of the target labels in the annotations file.</span>
+<span class="sd">    batch_size : int</span>
+<span class="sd">        The batch size for the DataLoader.</span>
+<span class="sd">    num_workers : int</span>
+<span class="sd">        The number of worker processes to use for data loading.</span>
+<span class="sd">    transformation : torchvision.transforms</span>
+<span class="sd">        A transform to apply to the image data.</span>
+<span class="sd">    unlabeled_samples : int or float, optional</span>
+<span class="sd">        The number of unlabeled samples to include. If float, it represents the fraction of unlabeled samples.</span>
+<span class="sd">        Default is None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    torch.utils.data.DataLoader</span>
+<span class="sd">        A PyTorch DataLoader for the multi-labeled image dataset.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the value of the parameter &#39;unlabeled_samples&#39; is invalid.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">unlabeled_samples</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">MultiLabeledImagesDataset</span><span class="p">(</span><span class="n">path_to_csv</span><span class="p">,</span> <span class="n">path_to_images</span><span class="p">,</span> <span class="n">image_names_column</span><span class="p">,</span> <span class="n">target_columns</span><span class="p">,</span>
+                                         <span class="n">transformation</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">SemiSupervisedImagesDataset</span><span class="p">(</span><span class="n">path_to_csv</span><span class="p">,</span> <span class="n">path_to_images</span><span class="p">,</span> <span class="n">image_names_column</span><span class="p">,</span> <span class="n">target_columns</span><span class="p">,</span>
+                                           <span class="n">unlabeled_samples</span><span class="p">,</span> <span class="n">transformation</span><span class="p">)</span>
+    <span class="n">dataloader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dataloader</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RevelioNN authors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
