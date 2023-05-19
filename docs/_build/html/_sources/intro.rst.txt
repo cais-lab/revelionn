@@ -5,7 +5,7 @@ Installation
 ------------
 
 The recommended way of using the library is to copy the contents of the ``revelionn``
-folder of the repository to your project. Install all the necessary missing dependencies for RevelioNN. In order to do so, you may
+folder of the repository to your project. The required Python version is 3.9. Install all the necessary missing dependencies for RevelioNN. In order to do so, you may
 want to run:
 
 .. code-block:: shell
@@ -22,14 +22,6 @@ virtual environment and install dependencies:
   $ python3 -m venv venv
   $ source venv/bin/activate
   $ pip install -r requirements.txt
-
-Another way to install RevelioNN would be to import the Conda environment:
-
-.. code-block:: shell
-
-    conda env create -f conda_environment.yml
-    conda activate revelionn
-
 
 It is also worth noting that `Java SE 8 <https://www.java.com/en/download/manual.jsp>`_ must be installed to form logical explanations.
 This is due to the fact that explanations using ontology are implemented using the external `BUNDLE <https://ml.unife.it/bundle/>`_ library.

@@ -187,17 +187,10 @@ RevelioNN also supports a command line-based interface, i.e. interaction through
 
 ## Installation
 
-You can view a list of required dependencies in the requirements.txt file. You can install them as follows:
+The required Python version is 3.9. You can view a list of required dependencies in the requirements.txt file. You can install them as follows:
 
 ```bash
 pip install -r requirements.txt
-```
-
-Another way to install it would be to import the Conda environment:
-
-```bash
-conda env create -f conda_environment.yml
-conda activate revelionn
 ```
 
 It is also worth noting that [Java SE 8](https://www.java.com/en/download/manual.jsp) must be installed to form logical explanations.
