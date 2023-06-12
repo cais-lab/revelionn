@@ -76,7 +76,7 @@ class MappingTrainer:
 
         self.main_net_module_name = main_model_data['main_net_module_name']
         self.main_net_class = main_model_data['main_net_class']
-        self.main_model_filepath = main_model_filepath
+        self.main_model_filename = os.path.splitext(os.path.basename(main_model_filepath))[0]
         self.transformation_name = main_model_data['transformation_name']
         self.img_size = main_model_data['img_size']
         self.num_channels = main_model_data['num_channels']
@@ -131,7 +131,7 @@ class MappingTrainer:
                                                             f'{concept}_{layer_names}_{mapping_neurons}_'
                                                             f'{self.main_module.get_class_labels()[1]}'),
                                                concept, self.main_net_module_name, self.main_net_class,
-                                               self.main_model_filepath,
+                                               self.main_model_filename,
                                                self.transformation_name, self.img_size, self.num_channels)
 
     def train_simultaneous_model(self, concepts, decoder_channels, num_shared_neurons, num_output_neurons):
@@ -173,7 +173,7 @@ class MappingTrainer:
                                                                   f'{num_shared_neurons}_'
                                                                   f'{num_output_neurons}'),
                                                      concepts, self.main_net_module_name, self.main_net_class,
-                                                     self.main_model_filepath, self.transformation_name, self.img_size,
+                                                     self.main_model_filename, self.transformation_name, self.img_size,
                                                      self.num_channels)
 
     def train_simultaneous_model_semisupervised(self, concepts, decoder_channels, num_shared_neurons,
@@ -226,7 +226,7 @@ class MappingTrainer:
                                                                     f'{num_shared_neurons}_'
                                                                     f'{num_output_neurons}'),
                                                        concepts, self.main_net_module_name, self.main_net_class,
-                                                       self.main_model_filepath, self.transformation_name,
+                                                       self.main_model_filename, self.transformation_name,
                                                        self.img_size,
                                                        self.num_channels)
 

@@ -81,7 +81,7 @@ def app(
         image_filepath: str,
         blackbox_classify: ClassifyImage,
         gen_bb_sal: GenerateImageClassifierBlackboxSaliency,
-        extracted_concepts: list[str],
+        extracted_concepts: list,
         img_size: int
 ):
     global image_filename, positive_classes_idx

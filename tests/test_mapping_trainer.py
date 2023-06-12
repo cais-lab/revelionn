@@ -18,7 +18,7 @@ def mapping_trainer():
 
     trainer = MappingTrainer(os.path.join(root_path, 'tests', 'data', 'main_models', 'TypeA_ResNet18.rvl'),
                              ['bn'], 2, 1,
-                             os.path.join(root_path, 'trained_models', 'mapping_models'), device,
+                             os.path.join(root_path, 'tests', 'data', 'mapping_models'), device,
                              os.path.join(root_path, 'tests', 'data', 'images'),
                              os.path.join(root_path, 'tests', 'data', 'partition', 'typeA_mapping_train.csv'),
                              os.path.join(root_path, 'tests', 'data', 'partition', 'typeA_mapping_val.csv'),
@@ -31,12 +31,12 @@ def mapping_trainer():
 def test_train_single_model(mapping_trainer):
     mapping_trainer.train_single_model([10, 5, 1], 'WarTrain', ['bn19'])
 
-    assert os.path.exists(os.path.join(root_path, 'trained_models', 'mapping_models',
+    assert os.path.exists(os.path.join(root_path, 'tests', 'data', 'mapping_models',
                                        "WarTrain_['bn19']_[10, 5, 1]_TypeA.rvl"))
 
     auc = mapping_trainer.evaluate_model()
 
-    assert auc is not None and 0 < auc < 1
+    assert auc is not None and 0 < auc <= 1
 
 
 def test_train_simultaneous_model(mapping_trainer):
@@ -44,13 +44,13 @@ def test_train_simultaneous_model(mapping_trainer):
                                              10, [10, 5], [5, 1])
     main_concept = 'TypeA'
 
-    assert os.path.exists(os.path.join(root_path, 'trained_models', 'mapping_models',
+    assert os.path.exists(os.path.join(root_path, 'tests', 'data', 'mapping_models',
                                        f"{main_concept}_10_[10, 5]_[5, 1].rvl"))
 
     concepts_auc, all_auc = mapping_trainer.evaluate_model()
 
     assert len(concepts_auc) == 5
-    assert all_auc is not None and 0 < all_auc < 1
+    assert all_auc is not None and 0 < all_auc <= 1
 
 
 def test_train_simultaneous_model_semisupervised(mapping_trainer):
@@ -60,11 +60,11 @@ def test_train_simultaneous_model_semisupervised(mapping_trainer):
     mapping_trainer.train_simultaneous_model_semisupervised(
         ['WarTrain', 'EmptyTrain', 'ReinforcedCar', 'PassengerCar', 'EmptyWagon'], 10, [10, 5], [5, 1], sl, 0.1, 300)
 
-    assert os.path.exists(os.path.join(root_path, 'trained_models', 'mapping_models',
+    assert os.path.exists(os.path.join(root_path, 'tests', 'data', 'mapping_models',
                                        f"TypeA_0.1_10_[10, 5]_[5, 1].rvl"))
 
     concepts_auc, all_auc = mapping_trainer.evaluate_model()
 
     assert len(concepts_auc) == 5
-    assert all_auc is not None and 0 < all_auc < 1
+    assert all_auc is not None and 0 < all_auc <= 1
 

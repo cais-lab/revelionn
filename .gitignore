@@ -13,7 +13,7 @@
 /scripts/__pycache__
 /scripts/log
 /tests/__pycache__
-/tests/data/main_net_classes/__pycache__
+/tests/data/temp
 /tests/.pytest_cache
 /tests/data/images
 /utils/project_saver_loader/__pycache__

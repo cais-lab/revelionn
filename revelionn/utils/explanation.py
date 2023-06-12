@@ -1,5 +1,6 @@
 import os
 import subprocess
+import pkg_resources
 import torch
 
 from revelionn.mapping_nets.simultaneous_mapping_net import SimultaneousMappingNet
@@ -115,36 +116,7 @@ def to_mapping_observation(concept, probability):
     return f'__input__ Type: {concept}, {str(probability)}\n'
 
 
-def explain_target_concept(extracted_concepts, mapping_probabilities, concepts_map, target_concept,
-                           jar_filepath, ontology_filepath, path_to_temp_files):
-    """
-
-    Parameters
-    ----------
-    extracted_concepts : list[str]
-        Concepts relevant to the target concept, which are extracted by the mapping network.
-    mapping_probabilities : list[float]
-        The probabilities, obtained from the output of the sigmoid, of each of the extracted concepts relevant to the
-        target concept.
-    concepts_map : dict
-        Dictionary whose keys are the names of the attributes of the dataset, and the values are the corresponding
-        concepts of the ontology.
-    target_concept : str
-        The concept of ontology, which should be obtained by ontological inference from the extracted concepts.
-    jar_filepath : str
-        Path to the script (file onto_justify.jar) that generates explanations based on the ontology.
-    ontology_filepath : str
-        Path to the OWL ontology file.
-    path_to_temp_files
-        Temporary files directory for storing observations and explanations.
-
-    Returns
-    -------
-    justifications : str
-        A set of obtained justifications of the target class.
-    """
-
-    observations_filepath = os.path.join(path_to_temp_files, 'observations.txt')
+def form_observations(observations_filepath, concepts_map, target_concept, extracted_concepts, mapping_probabilities):
     with open(observations_filepath, 'w') as observations_file:
         observations_file.write(to_main_observation(concepts_map[target_concept]))
 
@@ -159,7 +131,39 @@ def explain_target_concept(extracted_concepts, mapping_probabilities, concepts_m
 
         observations_file.close()
 
+
+def explain_target_concept(extracted_concepts, mapping_probabilities, concepts_map, target_concept, ontology_filepath,
+                           path_to_temp_files):
+    """
+
+    Parameters
+    ----------
+    extracted_concepts : list[str]
+        Concepts relevant to the target concept, which are extracted by the mapping network.
+    mapping_probabilities : list[float]
+        The probabilities, obtained from the output of the sigmoid, of each of the extracted concepts relevant to the
+        target concept.
+    concepts_map : dict
+        Dictionary whose keys are the names of the attributes of the dataset, and the values are the corresponding
+        concepts of the ontology.
+    target_concept : str
+        The concept of ontology, which should be obtained by ontological inference from the extracted concepts.
+    ontology_filepath : str
+        Path to the OWL ontology file.
+    path_to_temp_files
+        Temporary files directory for storing observations and explanations.
+
+    Returns
+    -------
+    justifications : str
+        A set of obtained justifications of the target class.
+    """
+
+    observations_filepath = os.path.join(path_to_temp_files, 'observations.txt')
+    form_observations(observations_filepath, concepts_map, target_concept, extracted_concepts, mapping_probabilities)
+
     justifications_filepath = os.path.join(path_to_temp_files, 'justifications.txt')
+    jar_filepath = pkg_resources.resource_filename(__name__, 'onto_justify.jar')
 
     subprocess.call(["java", "-Dsun.stdout.encoding=UTF-8", "-Dsun.err.encoding=UTF-8", "-jar",
                      jar_filepath, ontology_filepath, observations_filepath, justifications_filepath])

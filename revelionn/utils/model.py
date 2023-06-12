@@ -45,6 +45,11 @@ def convert_to_rvl_format(main_model, filename, class_label, module_name, main_n
                 'num_channels': num_channels
                 }, f'{filename}.rvl')
 
+    msg = 'The model was successfully converted to .rvl format.'
+    print(msg)
+
+    return msg
+
 
 def load_main_model(main_model_filepath, device):
     """
@@ -90,7 +95,7 @@ def load_mapping_model(mapping_model_filepath, main_models_directory, device):
     mapping_model_filepath : str
         File path containing the parameters of the mapping network model.
     main_models_directory : str
-        The directory containing the .py files in which the main network classes are defined.
+        Directory containing files with parameters of the main network models.
     device : torch.device
         Tensor processing device.
 
@@ -110,8 +115,9 @@ def load_mapping_model(mapping_model_filepath, main_models_directory, device):
     """
 
     mapping_model_data = torch.load(mapping_model_filepath, map_location=device)
-    main_module, transformation, img_size = load_main_model(os.path.join(main_models_directory,
-                                                                         mapping_model_data['main_model_filename']),
+    main_module, transformation, img_size = load_main_model(os.path.join
+                                                            (main_models_directory,
+                                                             f"{mapping_model_data['main_model_filename']}.rvl"),
                                                             device)
 
     if 'decoder_channels' in mapping_model_data:

@@ -27,9 +27,9 @@ def explain_class(args):
     except FileExistsError:
         pass
 
-    jar_filepath = os.path.join(root_path, 'scripts', 'onto_justify.jar')
-    justifications = explain_target_concept(extracted_concepts, mapping_probabilities, concepts_map, args.main_concept,
-                                            jar_filepath, os.path.join(root_path, 'ontologies', args.path_to_ontology),
+    justifications = explain_target_concept(extracted_concepts, mapping_probabilities, concepts_map,
+                                            args.target_concept,
+                                            os.path.join(root_path, 'ontologies', args.path_to_ontology),
                                             os.path.join(root_path, 'temp'))
     print(justifications)
 
