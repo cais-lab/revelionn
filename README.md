@@ -20,7 +20,7 @@ the concepts that are involved in its definition. Knowing the probabilities of e
 to form logical and visual explanations.
 
 <p align="center">
-  <img src="docs/images/scheme.svg" alt="General scheme" width="800"/>
+  <img src="docs/images/scheme.jpg" alt="General scheme" width="600"/>
 </p>
 
 ### Logical Explanations
@@ -150,8 +150,7 @@ ontology. This can be done as follows:
     from revelionn.utils.explanation import extract_concepts_from_img, explain_target_concept
     from ontologies.scdb_ontology import concepts_map
     from PIL import Image
-   
-    jar_filepath = os.path.join(root_path, 'scripts', 'onto_justify.jar')
+
     image_path = os.path.join(root_path, 'data', 'scdb_custom', 'images', '001236.png')
    
     image = Image.open(image_path)
@@ -166,7 +165,7 @@ ontology. This can be done as follows:
     print(f'{mapping_probabilities}\n')
        
     justifications = explain_target_concept(extracted_concepts, mapping_probabilities, concepts_map, 'C1',
-                                            jar_filepath, os.path.join(root_path, 'ontologies', 'SCDB.owl'), 
+                                            os.path.join(root_path, 'ontologies', 'SCDB.owl'), 
                                             os.path.join(root_path, 'temp'))
     print(justifications)
     ```
