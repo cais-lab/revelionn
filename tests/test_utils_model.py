@@ -8,7 +8,7 @@ from revelionn.activation_extraction import ActivationExtractor
 from revelionn.main_module import MainModelProcessing
 from revelionn.mapping_module import MappingModelProcessing
 from revelionn.utils.model import convert_to_rvl_format, load_main_model, load_mapping_model
-from main_net_classes.resnet18 import ResNet18, NUM_CHANNELS, IMG_SIDE_SIZE, transformation
+from .data.main_net_classes.resnet18 import ResNet18, NUM_CHANNELS, IMG_SIDE_SIZE, transformation
 
 cur_path = os.path.dirname(os.path.realpath(__file__))
 root_path = os.path.dirname(cur_path)
@@ -31,7 +31,8 @@ def test_convert_to_rvl_format():
 def test_load_main_model():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     main_module, transformation, img_size = load_main_model(os.path.join(
-        root_path, 'tests', 'data', 'main_models', 'TypeA_ResNet18.rvl'), device)
+        root_path, 'tests', 'data', 'main_models', 'TypeA_ResNet18.rvl'), os.path.join(
+        root_path, 'tests', 'data', 'main_net_classes'), device)
 
     # Perform assertions to check if the returned values are correct
     assert isinstance(main_module, MainModelProcessing)
@@ -43,7 +44,8 @@ def test_load_mapping_model():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     main_module, mapping_module, activation_extractor, transformation, img_size = load_mapping_model(
         os.path.join(root_path, 'tests', 'data', 'mapping_models', 'TypeA_10_[10, 5]_[5, 1].rvl'),
-        os.path.join(root_path, 'tests', 'data', 'main_models'),
+        os.path.join(root_path, 'tests', 'data', 'main_models'), os.path.join(
+            root_path, 'tests', 'data', 'main_net_classes'),
         device
     )
 

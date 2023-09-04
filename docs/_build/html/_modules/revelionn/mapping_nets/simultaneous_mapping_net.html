@@ -290,13 +290,13 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">activation_extractor</span><span class="p">,</span> <span class="n">decoder_channels</span><span class="p">,</span> <span class="n">num_shared_neurons</span><span class="p">,</span> <span class="n">num_output_neurons</span><span class="p">,</span> <span class="n">num_outs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Sets all the necessary attributes for the SingleMappingNet object.</span>
+<span class="sd">        Sets all the necessary attributes for the SimultaneousMappingNet object.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        activation_extractor : ActivationExtractor</span>
-<span class="sd">            Input number of neuron activations. Can be calculated by the count_num_activations() method of the</span>
-<span class="sd">            ActivationExtractor class.</span>
+<span class="sd">            Class for identifying layers of a convolutional neural network and for extracting activations produced</span>
+<span class="sd">            during network inference from a selected set of layers.</span>
 <span class="sd">        decoder_channels : int</span>
 <span class="sd">            The number of decoder channels. The output number of channels of the convolutional layer of the decoder or</span>
 <span class="sd">            the output number of neurons of the decoder of the fully connected layer.</span>

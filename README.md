@@ -2,7 +2,12 @@
 <img src="docs/images/logo.png" alt="Logo" width="600"><br/>
 <b>Retrospective Extraction of Visual and Logical Insights for Ontology-based interpretation of Neural Networks</b>
 </p>
- 
+
+[![Read the Docs](https://img.shields.io/readthedocs/revelionn)](https://revelionn.readthedocs.io/en/latest/)
+[![PyPI - Version](https://img.shields.io/pypi/v/revelionn)](https://pypi.org/project/revelionn/)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/revelionn)
+[![PyPI - License](https://img.shields.io/pypi/l/revelionn)](https://github.com/cais-lab/revelionn/blob/main/LICENSE)
+
 <b>RevelioNN</b> is an open-source library of post-hoc algorithms for explaining predictions of deep convolutional 
 neural networks of binary classification using ontologies. The algorithms are based on the construction of mapping 
 networks linking the internal representations of a convolutional neural network with ontology concepts. 
@@ -98,7 +103,7 @@ the following variables must also be declared:
    * variable storing the size of the image fed to the network;
    * the ``torchvision.transforms`` module object, which represents a transformation over images.
 
-   Examples of network descriptions are given in the main_net_classes directory.
+   Examples of network descriptions are given in the [main_net_classes](https://github.com/cais-lab/revelionn/tree/main/main_net_classes) directory.
 2. Next, you need to initialize your convolutional neural network model.
     ```
     from main_net_classes.resnet18_scdb import ResNet18, NUM_CHANNELS, IMG_SIDE_SIZE, transformation
@@ -123,10 +128,10 @@ Here is an example for training a simultaneous extraction network. Here activati
     from revelionn.mapping_trainer import MappingTrainer
    
     device = torch.device('cuda')
-    trainer = MappingTrainer('SCDB_ResNet18_C1.rvl', ['bn'], 20, 100, 
+    trainer = MappingTrainer('SCDB_ResNet18_C1.rvl', os.path.join(root_path, 'main_net_classes'), ['bn'], 20, 100, 
                              os.path.join(root_path, 'trained_models', 'mapping_models'),
                              device, os.path.join(root_path, 'data', 'scdb_custom', 'images'),
-                             'C1_mapping_train.csv', 'C1_mapping_val.csv', 'name', 100, 6)
+                             'C1_mapping_train.csv', 'C1_mapping_val.csv', 'name', 100, 6, None)
    
     trainer.train_simultaneous_model(['HexStar', 'EllStar', 'TEStarmarker', 'Hexagon', 
                                      'Star', 'Ellipse', 'Triangle', 'Starmarker'], 
@@ -140,7 +145,7 @@ the trained network model via ``load_mapping_model()``.
 
     main_module, mapping_module, activation_extractor, transformation, img_size = load_mapping_model(
         os.path.join(root_path, 'trained_models', 'mapping_models', 'C1_20_[160, 80, 40, 20]_[20, 1].rvl'), 
-        cur_path, device)
+        cur_path, os.path.join(root_path, 'main_net_classes'), device)
     ```
    
 6. To form logical explanations using an ontology, one must first extract the concepts relevant to the target concept 
@@ -180,13 +185,20 @@ ontology. This can be done as follows:
     plt.show()
     ```
 
-The execution of the listed steps is shown in basic_example.ipynb.
+The execution of the listed steps is shown in [basic_example.ipynb](https://github.com/cais-lab/revelionn/blob/main/examples/basic_example.ipynb).
 
 RevelioNN also supports a command line-based interface, i.e. interaction through scripts. A detailed description of how to use each of the scripts can be found in the documentation.
 
 ## Installation
 
-The required Python version is 3.9. You can view a list of required dependencies in the requirements.txt file. You can install them as follows:
+The simplest way to install RevelioNN is using ``pip``:
+
+```bash
+pip install revelionn
+pip install git+https://github.com/lucadiliello/semantic-loss-pytorch.git
+```
+
+You can view a list of required dependencies in the [requirements.txt](https://github.com/cais-lab/revelionn/blob/main/requirements.txt) file. You can also install them as follows:
 
 ```bash
 pip install -r requirements.txt
@@ -201,9 +213,20 @@ The repository includes the following directories:
 * Package `main_net_classes` contains various convolutional neural network architectures that can serve as examples for initializing your network in RevelioNN; 
 * Package `ontologies` contains examples of ontology files in OWL format, as well as examples of the dictionary of relations of dataset attributes to ontology concepts and examples of the class representing the ontology as a graph;
 * Package `examples` includes notebooks that contain practical examples of RevelioNN use;
-* Package `trained_models` is designed to save models of main and mapping networks, as well as their training logs; 
 * All unit and integration tests can be observed in the `tests` directory;
 * The sources of the documentation are in the `docs` directory.
+
+## Documentation
+
+A detailed RevelioNN description is available in [Read the Docs](https://revelionn.readthedocs.io/en/latest/).
+
+## Tests
+
+To run tests, you can use:
+
+```bash
+pytest tests
+```
 
 ## Publications
 

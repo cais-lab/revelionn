@@ -4,7 +4,7 @@ import sys
 import torch
 from PIL import Image
 
-from ontologies.xtrains_ontology import concepts_map
+from .data.ontologies.xtrains_ontology import concepts_map
 from revelionn.utils.explanation import extract_concepts_from_img, form_observations
 from revelionn.utils.model import load_mapping_model
 
@@ -17,7 +17,8 @@ def test_extract_concepts_from_img():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     main_module, mapping_module, activation_extractor, transformation, img_size = load_mapping_model(
         os.path.join(root_path, 'tests', 'data', 'mapping_models', 'TypeA_10_[10, 5]_[5, 1].rvl'),
-        os.path.join(root_path, 'tests', 'data', 'main_models'),
+        os.path.join(root_path, 'tests', 'data', 'main_models'), os.path.join(
+            root_path, 'tests', 'data', 'main_net_classes'),
         device
     )
 
@@ -37,7 +38,8 @@ def test_form_observations():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     main_module, mapping_module, activation_extractor, transformation, img_size = load_mapping_model(
         os.path.join(root_path, 'tests', 'data', 'mapping_models', 'TypeA_10_[10, 5]_[5, 1].rvl'),
-        os.path.join(root_path, 'tests', 'data', 'main_models'),
+        os.path.join(root_path, 'tests', 'data', 'main_models'), os.path.join(
+            root_path, 'tests', 'data', 'main_net_classes'),
         device
     )
 

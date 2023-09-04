@@ -72,14 +72,15 @@ class ActivationExtractor:
 
     def __init__(self, main_module, layers_types, is_concatenate):
         """
-        Sets all the necessary attributes for the MainNetExplanation object.
+        Sets all the necessary attributes for the ActivationExtractor object.
 
         Parameters
         ----------
         main_module : MainModelProcessing
             The model of the main neural network.
         layers_types : list
-            Types of layers to be found in the hierarchy of network layers.
+            Types of layers to be found in the hierarchy of network layers. Possible values of the list item: 'bn',
+            'conv', 'fc'.
         is_concatenate : bool
             Logical parameter that sets the mode of operation of ActivationExtractor. If True, the activations of the
             given layers are concatenated and transformed to a one-dimensional tensor. If False, the activations of the
@@ -286,13 +287,15 @@ class ActivationExtractor:
         Parameters
         ----------
         mapping_batch_size : int
-            The size of the data batch for training the mapping network.
+            The size of the data batch for training the mapping network. The size of the training set must be a
+            multiple of the size of the batch.
 
         Returns
         -------
         cur_acts : torch.Tensor or tuple[torch.Tensor]
             Activations of the studied layers.
         """
+
         if self.is_concatenate:
             cur_acts = None
             for layer in self.layers_for_research:

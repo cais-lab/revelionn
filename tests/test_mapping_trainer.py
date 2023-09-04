@@ -17,6 +17,7 @@ def mapping_trainer():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     trainer = MappingTrainer(os.path.join(root_path, 'tests', 'data', 'main_models', 'TypeA_ResNet18.rvl'),
+                             os.path.join(root_path, 'tests', 'data', 'main_net_classes'),
                              ['bn'], 2, 1,
                              os.path.join(root_path, 'tests', 'data', 'mapping_models'), device,
                              os.path.join(root_path, 'tests', 'data', 'images'),

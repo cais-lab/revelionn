@@ -1,4 +1,5 @@
 import importlib
+import importlib.util
 import os
 import torch
 from torch import optim
@@ -31,15 +32,18 @@ class MappingTrainer:
         Evaluates the mapping network model on the test set using the ROC AUC.
     """
 
-    def __init__(self, main_model_filepath, layers_types, patience, epochs, path_to_save, device,
-                 path_to_images, path_to_train_csv, path_to_valid_csv, image_names_column, batch_size, num_workers,
-                 path_to_test_csv):
+    def __init__(self, main_model_filepath, main_net_modules_directory, layers_types, patience, epochs, path_to_save,
+                 device, path_to_images, path_to_train_csv, path_to_valid_csv, image_names_column, batch_size,
+                 num_workers, path_to_test_csv):
         """
+        Sets all the necessary attributes for the MappingTrainer object.
 
         Parameters
         ----------
         main_model_filepath : str
             File path containing the parameters of the main network model.
+        main_net_modules_directory : str
+            Directory containing .py files with classes of the main networks.
         layers_types : list[str]
             Types of layers to be identified ('bn', 'fc', 'conv').
         patience : int
@@ -67,12 +71,15 @@ class MappingTrainer:
         """
 
         main_model_data = torch.load(main_model_filepath, map_location=device)
-        module = importlib.import_module(f"main_net_classes."
-                                         f"{main_model_data['main_net_module_name'].replace(os.sep, '.')}")
-        main_net = getattr(module, main_model_data['main_net_class'])()
+        module_path = os.path.join(main_net_modules_directory, f"{main_model_data['main_net_module_name']}.py")
+        spec = importlib.util.spec_from_file_location(main_model_data['main_net_module_name'], module_path)
+        main_net_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(main_net_module)
+
+        main_net = getattr(main_net_module, main_model_data['main_net_class'])()
         self.main_module = MainModelProcessing(main_net, device)
         self.main_module.load_model(os.path.join(main_model_filepath))
-        self.transformation = getattr(module, main_model_data['transformation_name'])
+        self.transformation = getattr(main_net_module, main_model_data['transformation_name'])
 
         self.main_net_module_name = main_model_data['main_net_module_name']
         self.main_net_class = main_model_data['main_net_class']

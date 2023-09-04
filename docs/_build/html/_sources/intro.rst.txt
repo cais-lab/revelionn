@@ -3,10 +3,18 @@ Introduction
 
 Installation
 ------------
+The simplest way to install RevelioNN is using ``pip``:
 
-The recommended way of using the library is to copy the contents of the ``revelionn``
-folder of the repository to your project. The required Python version is 3.9. Install all the necessary missing dependencies for RevelioNN. In order to do so, you may
-want to run:
+.. code-block:: shell
+
+  $ pip install revelionn
+  $ pip install git+https://github.com/lucadiliello/semantic-loss-pytorch.git
+
+
+RevelioNN supports versions of Python from 3.9 and up.
+
+Another possible way to install RevelioNN is to copy the contents of the ``revelionn``
+folder of the repository to your project. Install all the necessary missing dependencies for RevelioNN. In order to do so, you can run:
 
 .. code-block:: shell
 
@@ -17,7 +25,7 @@ virtual environment and install dependencies:
 
 .. code-block:: shell
 
-  $ git clone ...
+  $ git clone https://github.com/cais-lab/revelionn.git
   $ cd revelionn
   $ python3 -m venv venv
   $ source venv/bin/activate
@@ -41,7 +49,7 @@ Anyway, to use both methods, you need to do a few general steps:
     - variable storing the size of the image fed to the network;
     - the torchvision.transforms module object, which represents a transformation over images.
 
-   Examples of network descriptions are given in the ``main_net_classes`` directory. It is recommended to place your file in this directory as well.
+   Examples of network descriptions are given in the `main_net_classes <https://github.com/cais-lab/revelionn/tree/main/main_net_classes>`_ directory.
 
     .. note::
 

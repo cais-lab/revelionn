@@ -1,4 +1,5 @@
 import importlib
+import importlib.util
 import os
 import torch
 from revelionn.activation_extraction import ActivationExtractor
@@ -51,7 +52,7 @@ def convert_to_rvl_format(main_model, filename, class_label, module_name, main_n
     return msg
 
 
-def load_main_model(main_model_filepath, device):
+def load_main_model(main_model_filepath, main_net_modules_directory, device):
     """
     Loads the main network model in RevelioNN format from a file. Initializes and returns a class to work with
     the main net, as well as a transformation object and image size.
@@ -60,6 +61,8 @@ def load_main_model(main_model_filepath, device):
     ----------
     main_model_filepath : str
         File path containing the parameters of the main network model.
+    main_net_modules_directory : str
+        Directory containing .py files with classes of the main networks.
     device : torch.device
         Tensor processing device.
 
@@ -74,9 +77,17 @@ def load_main_model(main_model_filepath, device):
     """
 
     main_net_data = torch.load(main_model_filepath, map_location=device)
-    main_net_module = importlib.import_module(f"main_net_classes."
-                                              f"{main_net_data['main_net_module_name'].replace(os.sep, '.')}")
+    module_path = os.path.join(main_net_modules_directory, f"{main_net_data['main_net_module_name']}.py")
+    spec = importlib.util.spec_from_file_location(main_net_data['main_net_module_name'], module_path)
+    main_net_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(main_net_module)
+
     main_net = getattr(main_net_module, main_net_data['main_net_class'])()
+
+    # main_net_module = importlib.import_module(f"{main_net_modules_directory}."
+    #                                           f"{main_net_data['main_net_module_name'].replace(os.sep, '.')}")
+    # main_net = getattr(main_net_module, main_net_data['main_net_class'])()
+
     main_module = MainModelProcessing(main_net, device)
     main_module.load_model(main_model_filepath)
 
@@ -85,7 +96,7 @@ def load_main_model(main_model_filepath, device):
     return main_module, transformation, img_size
 
 
-def load_mapping_model(mapping_model_filepath, main_models_directory, device):
+def load_mapping_model(mapping_model_filepath, main_models_directory, main_net_modules_directory, device):
     """
     Loads the mapping network model from a file. Initializes and returns a class to work with the main net,
     as well as a transformation object and image size.
@@ -96,6 +107,8 @@ def load_mapping_model(mapping_model_filepath, main_models_directory, device):
         File path containing the parameters of the mapping network model.
     main_models_directory : str
         Directory containing files with parameters of the main network models.
+    main_net_modules_directory : str
+        Directory containing .py files with classes of the main networks.
     device : torch.device
         Tensor processing device.
 
@@ -118,6 +131,7 @@ def load_mapping_model(mapping_model_filepath, main_models_directory, device):
     main_module, transformation, img_size = load_main_model(os.path.join
                                                             (main_models_directory,
                                                              f"{mapping_model_data['main_model_filename']}.rvl"),
+                                                            main_net_modules_directory,
                                                             device)
 
     if 'decoder_channels' in mapping_model_data:

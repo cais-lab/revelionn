@@ -17,6 +17,7 @@ def test_perform_occlusion():
     main_module, mapping_module, activation_extractor, transformation, img_size = load_mapping_model(
         os.path.join(root_path, 'tests', 'data', 'mapping_models', 'C1_20_[160, 80, 40, 20]_[20, 1].rvl'),
         os.path.join(root_path, 'tests', 'data', 'main_models'),
+        os.path.join(root_path, 'tests', 'data', 'main_net_classes'),
         device
     )
 

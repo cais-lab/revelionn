@@ -38,3 +38,23 @@ Train acc: 0.294.. Valid acc: 0.296.. Train AUC: 0.702.. Valid AUC: 0.617..
 Train AUC WarTrain: 0.739.. Train AUC EmptyTrain: 0.958.. Train AUC ReinforcedCar: 0.796.. Train AUC PassengerCar: 0.446.. Train AUC EmptyWagon: 0.518..  
 Val AUC WarTrain: 0.517..Val AUC EmptyTrain: 0.949..Val AUC ReinforcedCar: 0.569..Val AUC PassengerCar: 0.472..Val AUC EmptyWagon: 0.579..
 Validation loss decreased (inf --> 0.818255).  Saving model ...
+Epoch 1/1.. Train loss: 0.819.. Valid loss: 0.776.. Train semantic loss: 0.156.. Valid semantic loss: 0.143.. 
+Train acc: 0.294.. Valid acc: 0.296.. Train AUC: 0.776.. Valid AUC: 0.774.. 
+Train AUC WarTrain: 0.854.. Train AUC EmptyTrain: 1.000.. Train AUC ReinforcedCar: 0.684.. Train AUC PassengerCar: 0.784.. Train AUC EmptyWagon: 0.522..  
+Val AUC WarTrain: 0.852..Val AUC EmptyTrain: 0.997..Val AUC ReinforcedCar: 0.817..Val AUC PassengerCar: 0.675..Val AUC EmptyWagon: 0.531..
+Validation loss decreased (inf --> 0.775634).  Saving model ...
+Epoch 1/1.. Train loss: 0.698.. Valid loss: 0.696.. Train semantic loss: 0.118.. Valid semantic loss: 0.116.. 
+Train acc: 0.294.. Valid acc: 0.296.. Train AUC: 0.707.. Valid AUC: 0.808.. 
+Train AUC WarTrain: 0.964.. Train AUC EmptyTrain: 0.754.. Train AUC ReinforcedCar: 0.597.. Train AUC PassengerCar: 0.788.. Train AUC EmptyWagon: 0.487..  
+Val AUC WarTrain: 1.000..Val AUC EmptyTrain: 0.844..Val AUC ReinforcedCar: 0.753..Val AUC PassengerCar: 0.912..Val AUC EmptyWagon: 0.531..
+Validation loss decreased (inf --> 0.695982).  Saving model ...
+Epoch 1/1.. Train loss: 0.742.. Valid loss: 0.708.. Train semantic loss: 0.133.. Valid semantic loss: 0.126.. 
+Train acc: 0.294.. Valid acc: 0.296.. Train AUC: 0.784.. Valid AUC: 0.788.. 
+Train AUC WarTrain: 0.988.. Train AUC EmptyTrain: 0.899.. Train AUC ReinforcedCar: 0.848.. Train AUC PassengerCar: 0.668.. Train AUC EmptyWagon: 0.539..  
+Val AUC WarTrain: 0.992..Val AUC EmptyTrain: 0.886..Val AUC ReinforcedCar: 0.896..Val AUC PassengerCar: 0.686..Val AUC EmptyWagon: 0.513..
+Validation loss decreased (inf --> 0.708360).  Saving model ...
+Epoch 1/1.. Train loss: 0.865.. Valid loss: 0.804.. Train semantic loss: 0.163.. Valid semantic loss: 0.153.. 
+Train acc: 0.144.. Valid acc: 0.296.. Train AUC: 0.606.. Valid AUC: 0.721.. 
+Train AUC WarTrain: 0.507.. Train AUC EmptyTrain: 0.970.. Train AUC ReinforcedCar: 0.764.. Train AUC PassengerCar: 0.292.. Train AUC EmptyWagon: 0.541..  
+Val AUC WarTrain: 0.746..Val AUC EmptyTrain: 0.995..Val AUC ReinforcedCar: 0.854..Val AUC PassengerCar: 0.495..Val AUC EmptyWagon: 0.515..
+Validation loss decreased (inf --> 0.803810).  Saving model ...

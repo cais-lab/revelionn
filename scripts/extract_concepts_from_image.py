@@ -1,33 +1,22 @@
 import argparse
-import os
-import sys
-
 import torch
 from PIL import Image
 
-cur_path = os.path.dirname(os.path.realpath(__file__))
-root_path = os.path.dirname(cur_path)
-sys.path.append(root_path)
-
-try:
-    from revelionn.utils.model import load_mapping_model
-    from revelionn.utils.explanation import extract_concepts_from_img
-except ModuleNotFoundError:
-    raise
+from revelionn.utils.model import load_mapping_model
+from revelionn.utils.explanation import extract_concepts_from_img
 
 
-def extract_concepts(path_to_img, mapping_model_filenames, device):
+def extract_concepts(path_to_img, mapping_model_filepaths, main_models_directory, main_net_modules_directory, device):
     device = torch.device(device)
 
-    img = Image.open(os.path.join(root_path, 'data', path_to_img))
+    img = Image.open(path_to_img)
     main_concepts = []
     extracted_concepts = []
     mapping_probabilities = []
 
-    for name in mapping_model_filenames:
+    for path in mapping_model_filepaths:
         main_module, mapping_module, activation_extractor, transformation, img_size = load_mapping_model(
-            os.path.join(root_path, 'trained_models', 'mapping_models', f'{name}.rvl'),
-            os.path.join(root_path, 'trained_models', 'main_models'), device)
+            path, main_models_directory, main_net_modules_directory, device)
 
         target_concepts, mapping_concepts, mapping_concept_probabilities = extract_concepts_from_img(main_module,
                                                                                                      mapping_module,
@@ -48,14 +37,13 @@ def extract_concepts(path_to_img, mapping_model_filenames, device):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Extracting concepts from an image')
-    parser.add_argument('path_to_img', type=str, help='The path to the image relative to the \'data\' '
-                                                      'directory')
+    parser.add_argument('path_to_img', type=str, help='The path to the image')
+    parser.add_argument('main_models_directory', type=str)
+    parser.add_argument('main_net_modules_directory', type=str)
     parser.add_argument('-d', '--device', type=str, default='cpu', help='Tensor processing device, default=\'cpu\'')
-    parser.add_argument('-m', '--mapping_model_filenames', nargs='+', type=str, help='Files containing the parameters '
-                                                                                     'of the mapping network model. '
-                                                                                     'Files must be located in the '
-                                                                                     '\'trained_models'
-                                                                                     '\\mapping_models\' directory.',
+    parser.add_argument('-m', '--mapping_model_filepaths', nargs='+', type=str, help='Files containing the parameters '
+                                                                                     'of the mapping network model.',
                         required=True)
     cmd_args = parser.parse_args()
-    extract_concepts(cmd_args.path_to_img, cmd_args.mapping_model_filenames, cmd_args.device)
+    extract_concepts(cmd_args.path_to_img, cmd_args.mapping_model_filepaths, cmd_args.main_models_directory,
+                     cmd_args.main_net_modules_directory, cmd_args.device)

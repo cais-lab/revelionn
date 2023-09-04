@@ -73,6 +73,7 @@
   <h1>Source code for revelionn.utils.explanation</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">pkg_resources</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 
 <span class="kn">from</span> <span class="nn">revelionn.mapping_nets.simultaneous_mapping_net</span> <span class="kn">import</span> <span class="n">SimultaneousMappingNet</span>
@@ -188,36 +189,7 @@
     <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;__input__ Type: </span><span class="si">{</span><span class="n">concept</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">probability</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span></div>
 
 
-<div class="viewcode-block" id="explain_target_concept"><a class="viewcode-back" href="../../../modules.html#revelionn.utils.explanation.explain_target_concept">[docs]</a><span class="k">def</span> <span class="nf">explain_target_concept</span><span class="p">(</span><span class="n">extracted_concepts</span><span class="p">,</span> <span class="n">mapping_probabilities</span><span class="p">,</span> <span class="n">concepts_map</span><span class="p">,</span> <span class="n">target_concept</span><span class="p">,</span>
-                           <span class="n">jar_filepath</span><span class="p">,</span> <span class="n">ontology_filepath</span><span class="p">,</span> <span class="n">path_to_temp_files</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    extracted_concepts : list[str]</span>
-<span class="sd">        Concepts relevant to the target concept, which are extracted by the mapping network.</span>
-<span class="sd">    mapping_probabilities : list[float]</span>
-<span class="sd">        The probabilities, obtained from the output of the sigmoid, of each of the extracted concepts relevant to the</span>
-<span class="sd">        target concept.</span>
-<span class="sd">    concepts_map : dict</span>
-<span class="sd">        Dictionary whose keys are the names of the attributes of the dataset, and the values are the corresponding</span>
-<span class="sd">        concepts of the ontology.</span>
-<span class="sd">    target_concept : str</span>
-<span class="sd">        The concept of ontology, which should be obtained by ontological inference from the extracted concepts.</span>
-<span class="sd">    jar_filepath : str</span>
-<span class="sd">        Path to the script (file onto_justify.jar) that generates explanations based on the ontology.</span>
-<span class="sd">    ontology_filepath : str</span>
-<span class="sd">        Path to the OWL ontology file.</span>
-<span class="sd">    path_to_temp_files</span>
-<span class="sd">        Temporary files directory for storing observations and explanations.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    justifications : str</span>
-<span class="sd">        A set of obtained justifications of the target class.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">observations_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_to_temp_files</span><span class="p">,</span> <span class="s1">&#39;observations.txt&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">form_observations</span><span class="p">(</span><span class="n">observations_filepath</span><span class="p">,</span> <span class="n">concepts_map</span><span class="p">,</span> <span class="n">target_concept</span><span class="p">,</span> <span class="n">extracted_concepts</span><span class="p">,</span> <span class="n">mapping_probabilities</span><span class="p">):</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">observations_filepath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">observations_file</span><span class="p">:</span>
         <span class="n">observations_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">to_main_observation</span><span class="p">(</span><span class="n">concepts_map</span><span class="p">[</span><span class="n">target_concept</span><span class="p">]))</span>
 
@@ -232,7 +204,39 @@
 
         <span class="n">observations_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
+
+<div class="viewcode-block" id="explain_target_concept"><a class="viewcode-back" href="../../../modules.html#revelionn.utils.explanation.explain_target_concept">[docs]</a><span class="k">def</span> <span class="nf">explain_target_concept</span><span class="p">(</span><span class="n">extracted_concepts</span><span class="p">,</span> <span class="n">mapping_probabilities</span><span class="p">,</span> <span class="n">concepts_map</span><span class="p">,</span> <span class="n">target_concept</span><span class="p">,</span> <span class="n">ontology_filepath</span><span class="p">,</span>
+                           <span class="n">path_to_temp_files</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    extracted_concepts : list[str]</span>
+<span class="sd">        Concepts relevant to the target concept, which are extracted by the mapping network.</span>
+<span class="sd">    mapping_probabilities : list[float]</span>
+<span class="sd">        The probabilities, obtained from the output of the sigmoid, of each of the extracted concepts relevant to the</span>
+<span class="sd">        target concept.</span>
+<span class="sd">    concepts_map : dict</span>
+<span class="sd">        Dictionary whose keys are the names of the attributes of the dataset, and the values are the corresponding</span>
+<span class="sd">        concepts of the ontology.</span>
+<span class="sd">    target_concept : str</span>
+<span class="sd">        The concept of ontology, which should be obtained by ontological inference from the extracted concepts.</span>
+<span class="sd">    ontology_filepath : str</span>
+<span class="sd">        Path to the OWL ontology file.</span>
+<span class="sd">    path_to_temp_files</span>
+<span class="sd">        Temporary files directory for storing observations and explanations.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    justifications : str</span>
+<span class="sd">        A set of obtained justifications of the target class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">observations_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_to_temp_files</span><span class="p">,</span> <span class="s1">&#39;observations.txt&#39;</span><span class="p">)</span>
+    <span class="n">form_observations</span><span class="p">(</span><span class="n">observations_filepath</span><span class="p">,</span> <span class="n">concepts_map</span><span class="p">,</span> <span class="n">target_concept</span><span class="p">,</span> <span class="n">extracted_concepts</span><span class="p">,</span> <span class="n">mapping_probabilities</span><span class="p">)</span>
+
     <span class="n">justifications_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_to_temp_files</span><span class="p">,</span> <span class="s1">&#39;justifications.txt&#39;</span><span class="p">)</span>
+    <span class="n">jar_filepath</span> <span class="o">=</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_filename</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="s1">&#39;onto_justify.jar&#39;</span><span class="p">)</span>
 
     <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s2">&quot;java&quot;</span><span class="p">,</span> <span class="s2">&quot;-Dsun.stdout.encoding=UTF-8&quot;</span><span class="p">,</span> <span class="s2">&quot;-Dsun.err.encoding=UTF-8&quot;</span><span class="p">,</span> <span class="s2">&quot;-jar&quot;</span><span class="p">,</span>
                      <span class="n">jar_filepath</span><span class="p">,</span> <span class="n">ontology_filepath</span><span class="p">,</span> <span class="n">observations_filepath</span><span class="p">,</span> <span class="n">justifications_filepath</span><span class="p">])</span>

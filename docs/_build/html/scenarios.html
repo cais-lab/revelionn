@@ -87,61 +87,61 @@ directory in a prepared virtual environment, you can interact with RevelioNN thr
 <ul class="simple">
 <li><p>Converting a pre-trained model to the RevelioNN format</p></li>
 </ul>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python convert_to_rvl_format.py &lt;model_filepath&gt; &lt;main_net_module_name&gt; &lt;main_net_class&gt; &lt;transformation_name&gt; &lt;img_size_name&gt; &lt;num_channels_name&gt; &lt;rvl_filename&gt; &lt;class_label&gt;
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python convert_to_rvl_format.py &lt;model_filepath&gt; &lt;main_net_modules_directory&gt; &lt;main_net_module_name&gt; &lt;main_net_class&gt; &lt;transformation_name&gt; &lt;img_size_name&gt; &lt;num_channels_name&gt; &lt;rvl_filename&gt; &lt;class_label&gt;
 </pre></div>
 </div>
 <ul class="simple">
 <li><p>Printing a dictionary of layers of the main neural network</p></li>
 </ul>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python print_layers_dict.py &lt;module_name&gt; &lt;main_net_class&gt; -l &lt;layer_types&gt;
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python print_layers_dict.py &lt;main_net_modules_directory&gt; &lt;main_net_module_name&gt; &lt;main_net_class&gt; -l &lt;layer_types&gt;
 </pre></div>
 </div>
 <ul class="simple">
 <li><p>Training of the main networks</p></li>
 </ul>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python train_main_nets.py &lt;module_name&gt; &lt;main_net_class&gt; &lt;transformation_name&gt; &lt;img_size_name&gt; &lt;num_channels_name&gt; &lt;path_to_images&gt; &lt;path_to_train_csv&gt; &lt;path_to_valid_csv&gt; &lt;image_names_column&gt; -l &lt;label_columns&gt; -d &lt;device&gt;
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python train_main_nets.py &lt;main_net_modules_directory&gt; &lt;module_name&gt; &lt;main_net_class&gt; &lt;transformation_name&gt; &lt;img_size_name&gt; &lt;num_channels_name&gt; &lt;path_to_images&gt; &lt;path_to_train_csv&gt; &lt;path_to_valid_csv&gt; &lt;image_names_column&gt; -l &lt;label_columns&gt; -d &lt;device&gt;
 </pre></div>
 </div>
 <ul class="simple">
 <li><p>Evaluation of the main networks</p></li>
 </ul>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python evaluate_main_nets.py &lt;path_to_images&gt; &lt;path_to_test_csv&gt; &lt;image_names_column&gt; -m &lt;main_model_filenames&gt; -d &lt;device&gt;
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python evaluate_main_nets.py &lt;path_to_images&gt; &lt;path_to_test_csv&gt; &lt;image_names_column&gt; &lt;main_net_modules_directory&gt; -m &lt;main_model_filenames&gt; -d &lt;device&gt;
 </pre></div>
 </div>
 <ul class="simple">
 <li><p>Training a single mapping network</p></li>
 </ul>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python train_single_mapping_net.py &lt;main_model_filename&gt; &lt;path_to_images&gt; &lt;path_to_train_csv&gt; &lt;path_to_valid_csv&gt; &lt;image_names_column&gt; &lt;label_column&gt; --layers_types &lt;layer_types&gt; --layers &lt;layers&gt; --num_neurons &lt;num_neurons&gt; -d &lt;device&gt;
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python train_single_mapping_net.py &lt;main_model_filepath&gt; &lt;main_net_modules_directory&gt; &lt;path_to_images&gt; &lt;path_to_train_csv&gt; &lt;path_to_valid_csv&gt; &lt;image_names_column&gt; &lt;label_column&gt; --layers_types &lt;layer_types&gt; --layers &lt;layers&gt; --num_neurons &lt;num_neurons&gt; -d &lt;device&gt;
 </pre></div>
 </div>
 <ul class="simple">
 <li><p>Training a simultaneous mapping network</p></li>
 </ul>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python train_simultaneous_mapping_net.py &lt;main_model_filename&gt; &lt;path_to_images&gt; &lt;path_to_train_csv&gt; &lt;path_to_valid_csv&gt; &lt;image_names_column&gt; --label_columns &lt;label_columns&gt; --layers_types &lt;layer_types&gt; --decoder_channels &lt;decoder_channels&gt; --num_shared_neurons &lt;num_shared_neurons&gt; --num_output_neurons &lt;num_output_neurons&gt; -d &lt;device&gt;
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python train_simultaneous_mapping_net.py &lt;main_model_filename&gt; &lt;main_net_modules_directory&gt; &lt;path_to_images&gt; &lt;path_to_train_csv&gt; &lt;path_to_valid_csv&gt; &lt;image_names_column&gt; --label_columns &lt;label_columns&gt; --layers_types &lt;layer_types&gt; --decoder_channels &lt;decoder_channels&gt; --num_shared_neurons &lt;num_shared_neurons&gt; --num_output_neurons &lt;num_output_neurons&gt; -d &lt;device&gt;
 </pre></div>
 </div>
 <ul class="simple">
 <li><p>Evaluation of the mapping network</p></li>
 </ul>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python evaluate_mapping_net.py &lt;path_to_images&gt; &lt;path_to_test_csv&gt; &lt;image_names_column&gt; -m &lt;mapping_model_filename&gt; -d &lt;device&gt;
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python evaluate_mapping_net.py &lt;path_to_images&gt; &lt;path_to_test_csv&gt; &lt;image_names_column&gt; main_net_modules_directory -m &lt;mapping_model_filename&gt; -d &lt;device&gt;
 </pre></div>
 </div>
 <ul class="simple">
 <li><p>Extracting concepts from an image</p></li>
 </ul>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python extract_concepts_from_image.py &lt;path_to_img&gt; -m &lt;mapping_model_filenames&gt; -d &lt;device&gt;
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python extract_concepts_from_image.py &lt;path_to_img&gt; &lt;main_models_directory&gt; &lt;main_net_modules_directory&gt; -m &lt;mapping_model_filepaths&gt; -d &lt;device&gt;
 </pre></div>
 </div>
 <ul class="simple">
 <li><p>Formation of logical explanations based on ontology</p></li>
 </ul>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python form_logical_explanations.py &lt;path_to_img&gt; &lt;path_to_ontology&gt; &lt;concepts_map_module_name&gt; &lt;concepts_map_name&gt; &lt;main_concept&gt; -m &lt;mapping_model_filenames&gt; -d &lt;device&gt;
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python form_logical_explanations.py &lt;path_to_img&gt; &lt;path_to_ontology&gt; &lt;concepts_map_directory&gt; &lt;concepts_map_module_name&gt; &lt;concepts_map_name&gt; &lt;target_concept&gt; &lt;main_models_directory&gt; &lt;main_net_modules_directory&gt; -m &lt;mapping_model_filenames&gt; -d &lt;device&gt;
 </pre></div>
 </div>
 <ul class="simple">
 <li><p>Formation of visual explanations</p></li>
 </ul>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python form_visual_explanations.py &lt;path_to_img&gt; &lt;mapping_model_filename&gt; --window_size &lt;window_size&gt; --stride &lt;stride&gt;
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python form_visual_explanations.py &lt;path_to_img&gt; &lt;mapping_model_filepath&gt; &lt;main_models_directory&gt; &lt;main_net_modules_directory&gt; --window_size &lt;window_size&gt; --stride &lt;stride&gt;
 </pre></div>
 </div>
 <p>To get detailed information on each of the scripts, you need to run:</p>
@@ -190,7 +190,7 @@ the trained network model via <code class="docutils literal notranslate"><span c
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">revelionn.utils.model</span> <span class="kn">import</span> <span class="n">load_mapping_model</span>
 
 <span class="n">main_module</span><span class="p">,</span> <span class="n">mapping_module</span><span class="p">,</span> <span class="n">activation_extractor</span><span class="p">,</span> <span class="n">transformation</span><span class="p">,</span> <span class="n">img_size</span> <span class="o">=</span>
-<span class="n">load_mapping_model</span><span class="p">(</span><span class="n">mapping_model_filepath</span><span class="p">,</span> <span class="n">main_models_directory</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+<span class="n">load_mapping_model</span><span class="p">(</span><span class="n">mapping_model_filepath</span><span class="p">,</span> <span class="n">main_models_directory</span><span class="p">,</span> <span class="n">main_net_modules_directory</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
 </pre></div>
 </div>
 </div></blockquote>

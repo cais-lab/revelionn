@@ -145,14 +145,15 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">main_module</span><span class="p">,</span> <span class="n">layers_types</span><span class="p">,</span> <span class="n">is_concatenate</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Sets all the necessary attributes for the MainNetExplanation object.</span>
+<span class="sd">        Sets all the necessary attributes for the ActivationExtractor object.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        main_module : MainModelProcessing</span>
 <span class="sd">            The model of the main neural network.</span>
 <span class="sd">        layers_types : list</span>
-<span class="sd">            Types of layers to be found in the hierarchy of network layers.</span>
+<span class="sd">            Types of layers to be found in the hierarchy of network layers. Possible values of the list item: &#39;bn&#39;,</span>
+<span class="sd">            &#39;conv&#39;, &#39;fc&#39;.</span>
 <span class="sd">        is_concatenate : bool</span>
 <span class="sd">            Logical parameter that sets the mode of operation of ActivationExtractor. If True, the activations of the</span>
 <span class="sd">            given layers are concatenated and transformed to a one-dimensional tensor. If False, the activations of the</span>
@@ -359,13 +360,15 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        mapping_batch_size : int</span>
-<span class="sd">            The size of the data batch for training the mapping network.</span>
+<span class="sd">            The size of the data batch for training the mapping network. The size of the training set must be a</span>
+<span class="sd">            multiple of the size of the batch.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        cur_acts : torch.Tensor or tuple[torch.Tensor]</span>
 <span class="sd">            Activations of the studied layers.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_concatenate</span><span class="p">:</span>
             <span class="n">cur_acts</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers_for_research</span><span class="p">:</span>

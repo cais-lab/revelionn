@@ -217,13 +217,13 @@ class SimultaneousMappingNet(nn.Module):
 
     def __init__(self, activation_extractor, decoder_channels, num_shared_neurons, num_output_neurons, num_outs):
         """
-        Sets all the necessary attributes for the SingleMappingNet object.
+        Sets all the necessary attributes for the SimultaneousMappingNet object.
 
         Parameters
         ----------
         activation_extractor : ActivationExtractor
-            Input number of neuron activations. Can be calculated by the count_num_activations() method of the
-            ActivationExtractor class.
+            Class for identifying layers of a convolutional neural network and for extracting activations produced
+            during network inference from a selected set of layers.
         decoder_channels : int
             The number of decoder channels. The output number of channels of the convolutional layer of the decoder or
             the output number of neurons of the decoder of the fully connected layer.

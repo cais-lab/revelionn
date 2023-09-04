@@ -17,6 +17,7 @@ Ontology Representation
 -----------------------
 
 To form logical explanations through ontological inference the ontology must be represented in the OWL 2 language.
+Also, in your ontology, it is necessary to define an individual with the name "``__input__``", which will be used in the future to form ontological explanations.
 In addition, it is necessary to describe the so-called concepts map, which is a dictionary whose keys are the names of
 the attributes of the dataset, and the values are the corresponding concepts of the ontology. For example, for the XTRAINS dataset ontology, the concept map would look like this:
 

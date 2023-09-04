@@ -13,61 +13,61 @@ directory in a prepared virtual environment, you can interact with RevelioNN thr
 
 .. code-block:: shell
 
-  $ python convert_to_rvl_format.py <model_filepath> <main_net_module_name> <main_net_class> <transformation_name> <img_size_name> <num_channels_name> <rvl_filename> <class_label>
+  $ python convert_to_rvl_format.py <model_filepath> <main_net_modules_directory> <main_net_module_name> <main_net_class> <transformation_name> <img_size_name> <num_channels_name> <rvl_filename> <class_label>
 
 - Printing a dictionary of layers of the main neural network
 
 .. code-block:: shell
 
-  $ python print_layers_dict.py <module_name> <main_net_class> -l <layer_types>
+  $ python print_layers_dict.py <main_net_modules_directory> <main_net_module_name> <main_net_class> -l <layer_types>
 
 - Training of the main networks
 
 .. code-block:: shell
 
-  $ python train_main_nets.py <module_name> <main_net_class> <transformation_name> <img_size_name> <num_channels_name> <path_to_images> <path_to_train_csv> <path_to_valid_csv> <image_names_column> -l <label_columns> -d <device>
+  $ python train_main_nets.py <main_net_modules_directory> <module_name> <main_net_class> <transformation_name> <img_size_name> <num_channels_name> <path_to_images> <path_to_train_csv> <path_to_valid_csv> <image_names_column> -l <label_columns> -d <device>
 
 - Evaluation of the main networks
 
 .. code-block:: shell
 
-  $ python evaluate_main_nets.py <path_to_images> <path_to_test_csv> <image_names_column> -m <main_model_filenames> -d <device>
+  $ python evaluate_main_nets.py <path_to_images> <path_to_test_csv> <image_names_column> <main_net_modules_directory> -m <main_model_filenames> -d <device>
 
 - Training a single mapping network
 
 .. code-block:: shell
 
-  $ python train_single_mapping_net.py <main_model_filename> <path_to_images> <path_to_train_csv> <path_to_valid_csv> <image_names_column> <label_column> --layers_types <layer_types> --layers <layers> --num_neurons <num_neurons> -d <device>
+  $ python train_single_mapping_net.py <main_model_filepath> <main_net_modules_directory> <path_to_images> <path_to_train_csv> <path_to_valid_csv> <image_names_column> <label_column> --layers_types <layer_types> --layers <layers> --num_neurons <num_neurons> -d <device>
 
 - Training a simultaneous mapping network
 
 .. code-block:: shell
 
-  $ python train_simultaneous_mapping_net.py <main_model_filename> <path_to_images> <path_to_train_csv> <path_to_valid_csv> <image_names_column> --label_columns <label_columns> --layers_types <layer_types> --decoder_channels <decoder_channels> --num_shared_neurons <num_shared_neurons> --num_output_neurons <num_output_neurons> -d <device>
+  $ python train_simultaneous_mapping_net.py <main_model_filename> <main_net_modules_directory> <path_to_images> <path_to_train_csv> <path_to_valid_csv> <image_names_column> --label_columns <label_columns> --layers_types <layer_types> --decoder_channels <decoder_channels> --num_shared_neurons <num_shared_neurons> --num_output_neurons <num_output_neurons> -d <device>
 
 - Evaluation of the mapping network
 
 .. code-block:: shell
 
-  $ python evaluate_mapping_net.py <path_to_images> <path_to_test_csv> <image_names_column> -m <mapping_model_filename> -d <device>
+  $ python evaluate_mapping_net.py <path_to_images> <path_to_test_csv> <image_names_column> main_net_modules_directory -m <mapping_model_filename> -d <device>
 
 - Extracting concepts from an image
 
 .. code-block:: shell
 
-  $ python extract_concepts_from_image.py <path_to_img> -m <mapping_model_filenames> -d <device>
+  $ python extract_concepts_from_image.py <path_to_img> <main_models_directory> <main_net_modules_directory> -m <mapping_model_filepaths> -d <device>
 
 - Formation of logical explanations based on ontology
 
 .. code-block:: shell
 
-  $ python form_logical_explanations.py <path_to_img> <path_to_ontology> <concepts_map_module_name> <concepts_map_name> <main_concept> -m <mapping_model_filenames> -d <device>
+  $ python form_logical_explanations.py <path_to_img> <path_to_ontology> <concepts_map_directory> <concepts_map_module_name> <concepts_map_name> <target_concept> <main_models_directory> <main_net_modules_directory> -m <mapping_model_filenames> -d <device>
 
 - Formation of visual explanations
 
 .. code-block:: shell
 
-  $ python form_visual_explanations.py <path_to_img> <mapping_model_filename> --window_size <window_size> --stride <stride>
+  $ python form_visual_explanations.py <path_to_img> <mapping_model_filepath> <main_models_directory> <main_net_modules_directory> --window_size <window_size> --stride <stride>
 
 To get detailed information on each of the scripts, you need to run:
 
@@ -114,7 +114,7 @@ To use the API, follow these steps:
        from revelionn.utils.model import load_mapping_model
 
        main_module, mapping_module, activation_extractor, transformation, img_size =
-       load_mapping_model(mapping_model_filepath, main_models_directory, device)
+       load_mapping_model(mapping_model_filepath, main_models_directory, main_net_modules_directory, device)
 
 #. To form logical explanations using an ontology, one must first extract the concepts relevant to the target concept
    from the image, and then transfer the extracted concepts and their probabilities to the reasoning module along with the

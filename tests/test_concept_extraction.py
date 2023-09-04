@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import MagicMock
 
-from ontologies.xtrains_ontology import create_xtrains_nxo
+from .data.ontologies.xtrains_ontology import create_xtrains_nxo
 from revelionn.concept_extraction import ConceptExtractor
 
 

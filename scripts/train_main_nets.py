@@ -1,23 +1,24 @@
 import argparse
 import importlib
+import importlib.util
 import torch
 import os
 import sys
+from revelionn.main_module import MainModelProcessing
+from revelionn.datasets import create_dataloader
 
 cur_path = os.path.dirname(os.path.realpath(__file__))
 root_path = os.path.dirname(cur_path)
 sys.path.append(root_path)
 
-try:
-    from revelionn.main_module import MainModelProcessing
-    from revelionn.datasets import MultiLabeledImagesDataset, create_dataloader
-except ModuleNotFoundError:
-    raise
-
 
 def train_main_nets(args):
     device = torch.device(args.device)
-    module = importlib.import_module(f'main_net_classes.{args.main_net_module_name.replace(os.sep, ".")}')
+
+    module_path = os.path.join(args.main_net_modules_directory, f"{args.main_net_module_name}.py")
+    spec = importlib.util.spec_from_file_location(args.main_net_module_name, module_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
 
     transformation = getattr(module, args.transformation_name)
     for class_label in args.label_columns:
@@ -57,6 +58,8 @@ def train_main_nets(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Training of the main networks')
+    parser.add_argument('main_net_modules_directory', type=str, help='Path to the folder containing classes of neural '
+                                                                     'network models.')
     parser.add_argument('main_net_module_name', type=str, help='The name of the file containing the main network '
                                                                'class, a variable storing transformations, a variable '
                                                                'storing the size of the image side, and a variable '

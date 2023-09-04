@@ -19,3 +19,7 @@
 /utils/project_saver_loader/__pycache__
 /temp
 /trained_models
+/experiments
+/revelionn.egg-info
+/dist
+/scripts/temp

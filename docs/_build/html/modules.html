@@ -1175,7 +1175,8 @@ satisfies the predicate.</p></li>
 <dd><p>Returns the activation tensor of the studied layers.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>mapping_batch_size</strong> (<em>int</em>) – The size of the data batch for training the mapping network.</p>
+<dd class="field-odd"><p><strong>mapping_batch_size</strong> (<em>int</em>) – The size of the data batch for training the mapping network. The size of the training set must be a
+multiple of the size of the batch.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>cur_acts</strong> – Activations of the studied layers.</p>
@@ -1564,7 +1565,7 @@ and .vtree.</p></li>
 <span id="mapping-trainer"></span><h2>mapping_trainer<a class="headerlink" href="#module-revelionn.mapping_trainer" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="revelionn.mapping_trainer.MappingTrainer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">revelionn.mapping_trainer.</span></span><span class="sig-name descname"><span class="pre">MappingTrainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">main_model_filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layers_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patience</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epochs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_to_save</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_to_images</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_to_train_csv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_to_valid_csv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_names_column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_to_test_csv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/revelionn/mapping_trainer.html#MappingTrainer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#revelionn.mapping_trainer.MappingTrainer" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">revelionn.mapping_trainer.</span></span><span class="sig-name descname"><span class="pre">MappingTrainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">main_model_filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">main_net_modules_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layers_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patience</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epochs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_to_save</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_to_images</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_to_train_csv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_to_valid_csv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_names_column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_to_test_csv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/revelionn/mapping_trainer.html#MappingTrainer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#revelionn.mapping_trainer.MappingTrainer" title="Permalink to this definition"></a></dt>
 <dd><p>Mapping Trainer class provides an interface for learning/evaluating mapping networks</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="revelionn.mapping_trainer.MappingTrainer.train_single_model">
@@ -2314,7 +2315,7 @@ If 0, a negative value, or None, work will be performed on the main-thread in-li
 <span id="utils-explanation"></span><h2>utils.explanation<a class="headerlink" href="#module-revelionn.utils.explanation" title="Permalink to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="revelionn.utils.explanation.explain_target_concept">
-<span class="sig-prename descclassname"><span class="pre">revelionn.utils.explanation.</span></span><span class="sig-name descname"><span class="pre">explain_target_concept</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extracted_concepts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping_probabilities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concepts_map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_concept</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jar_filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ontology_filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_to_temp_files</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/revelionn/utils/explanation.html#explain_target_concept"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#revelionn.utils.explanation.explain_target_concept" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">revelionn.utils.explanation.</span></span><span class="sig-name descname"><span class="pre">explain_target_concept</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extracted_concepts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping_probabilities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concepts_map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_concept</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ontology_filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_to_temp_files</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/revelionn/utils/explanation.html#explain_target_concept"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#revelionn.utils.explanation.explain_target_concept" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2324,7 +2325,6 @@ target concept.</p></li>
 <li><p><strong>concepts_map</strong> (<em>dict</em>) – Dictionary whose keys are the names of the attributes of the dataset, and the values are the corresponding
 concepts of the ontology.</p></li>
 <li><p><strong>target_concept</strong> (<em>str</em>) – The concept of ontology, which should be obtained by ontological inference from the extracted concepts.</p></li>
-<li><p><strong>jar_filepath</strong> (<em>str</em>) – Path to the script (file onto_justify.jar) that generates explanations based on the ontology.</p></li>
 <li><p><strong>ontology_filepath</strong> (<em>str</em>) – Path to the OWL ontology file.</p></li>
 <li><p><strong>path_to_temp_files</strong> – Temporary files directory for storing observations and explanations.</p></li>
 </ul>
@@ -2425,13 +2425,14 @@ target concept.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="revelionn.utils.model.load_main_model">
-<span class="sig-prename descclassname"><span class="pre">revelionn.utils.model.</span></span><span class="sig-name descname"><span class="pre">load_main_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">main_model_filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/revelionn/utils/model.html#load_main_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#revelionn.utils.model.load_main_model" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">revelionn.utils.model.</span></span><span class="sig-name descname"><span class="pre">load_main_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">main_model_filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">main_net_modules_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/revelionn/utils/model.html#load_main_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#revelionn.utils.model.load_main_model" title="Permalink to this definition"></a></dt>
 <dd><p>Loads the main network model in RevelioNN format from a file. Initializes and returns a class to work with
 the main net, as well as a transformation object and image size.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>main_model_filepath</strong> (<em>str</em>) – File path containing the parameters of the main network model.</p></li>
+<li><p><strong>main_net_modules_directory</strong> (<em>str</em>) – Directory containing .py files with classes of the main networks.</p></li>
 <li><p><strong>device</strong> (<em>torch.device</em>) – Tensor processing device.</p></li>
 </ul>
 </dd>
@@ -2448,14 +2449,15 @@ the main net, as well as a transformation object and image size.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="revelionn.utils.model.load_mapping_model">
-<span class="sig-prename descclassname"><span class="pre">revelionn.utils.model.</span></span><span class="sig-name descname"><span class="pre">load_mapping_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mapping_model_filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">main_models_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/revelionn/utils/model.html#load_mapping_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#revelionn.utils.model.load_mapping_model" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">revelionn.utils.model.</span></span><span class="sig-name descname"><span class="pre">load_mapping_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mapping_model_filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">main_models_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">main_net_modules_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/revelionn/utils/model.html#load_mapping_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#revelionn.utils.model.load_mapping_model" title="Permalink to this definition"></a></dt>
 <dd><p>Loads the mapping network model from a file. Initializes and returns a class to work with the main net,
 as well as a transformation object and image size.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>mapping_model_filepath</strong> (<em>str</em>) – File path containing the parameters of the mapping network model.</p></li>
-<li><p><strong>main_models_directory</strong> (<em>str</em>) – The directory containing the .py files in which the main network classes are defined.</p></li>
+<li><p><strong>main_models_directory</strong> (<em>str</em>) – Directory containing files with parameters of the main network models.</p></li>
+<li><p><strong>main_net_modules_directory</strong> (<em>str</em>) – Directory containing .py files with classes of the main networks.</p></li>
 <li><p><strong>device</strong> (<em>torch.device</em>) – Tensor processing device.</p></li>
 </ul>
 </dd>
