@@ -13,3 +13,4 @@ semantic-loss-pytorch @ git+https://github.com/lucadiliello/semantic-loss-pytorc
 torch>=2.0.0
 torchvision>=0.15.0
 xaitk-saliency>=0.7.0
+sphinx_rtd_theme

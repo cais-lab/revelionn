@@ -5,7 +5,7 @@
 
 [![Read the Docs](https://img.shields.io/readthedocs/revelionn)](https://revelionn.readthedocs.io/en/latest/)
 [![PyPI - Version](https://img.shields.io/pypi/v/revelionn)](https://pypi.org/project/revelionn/)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/revelionn)
+[![Downloads](https://static.pepy.tech/badge/revelionn)](https://pepy.tech/project/revelionn)
 [![PyPI - License](https://img.shields.io/pypi/l/revelionn)](https://github.com/cais-lab/revelionn/blob/main/LICENSE)
 
 <b>RevelioNN</b> is an open-source library of post-hoc algorithms for explaining predictions of deep convolutional 
@@ -16,6 +16,9 @@ neural networks was proposed:
 
 *  M. de Sousa Ribeiro and J. Leite, “Aligning Artificial Neural Networks and Ontologies towards Explainable AI,” in 35th AAAI Conference on Artificial Intelligence, AAAI 2021, May 2021, vol. 6A, no. 6, pp. 4932–4940. doi: [10.1609/aaai.v35i6.16626](https://doi.org/10.1609/aaai.v35i6.16626).
 
+The RevelioNN library was presented in the following paper:
+
+* A. Agafonov and A. Ponomarev, “RevelioNN: Retrospective Extraction of Visual and Logical Insights for Ontology-Based Interpretation of Neural Networks,” Conf. Open Innov. Assoc. Fruct, pp. 3–9, 2023, doi: [10.23919/fruct60429.2023.10328156](https://doi.org/10.23919/FRUCT60429.2023.10328156).
 ## How the library works
 The convolutional neural network, whose predictions need to be explained, is called “main” network. When an image is 
 passed through it, the output is a probability of some target class, which at the same time is a concept of ontology. 
@@ -234,6 +237,8 @@ The library was used in the following publications:
 * Agafonov A., Ponomarev A. An Experiment on Localization of Ontology Concepts in Deep Convolutional Neural Networks // In the *11th International Symposium on Information and Communication Technology (SoICT 2022)*, 82–87. DOI: [10.1145/3568562.3568602](http://doi.org/10.1145/3568562.3568602)
 * Ponomarev A., Agafonov A. Ontology Concept Extraction Algorithm for Deep Neural Networks // *Proceedings of the 32nd Conference of Open Innovations Association FRUCT*, 221-226. DOI: [10.23919/FRUCT56874.2022.9953838](http://doi.org/10.23919/FRUCT56874.2022.9953838)
 * Agafonov A., Ponomarev A. Localization of Ontology Concepts in Deep Convolutional Neural Networks // *2022 IEEE International Multi-Conference on Engineering, Computer and Information Sciences (SIBIRCON)*, 160-165. DOI: [10.1109/SIBIRCON56155.2022.10016932](http://doi.org/10.1109/SIBIRCON56155.2022.10016932)
+* Ponomarev, A., Agafonov, A. (2024). Ontology-Based Post-Hoc Neural Network Explanations Via Simultaneous Concept Extraction. In: *Arai, K. (eds) Intelligent Systems and Applications. IntelliSys 2023. Lecture Notes in Networks and Systems*, vol 823. Springer, Cham. https://doi.org/10.1007/978-3-031-47724-9_29
+* Smirnov, A.; Agafonov, A. and Shilov, N. (2024). Studying Trustworthiness of Neural-Symbolic Models for Enterprise Model Classification via Post-Hoc Explanation.  In *Proceedings of the 26th International Conference on Enterprise Information Systems* - Volume 1, ISBN 978-989-758-692-7, ISSN 2184-4992, pages 873-880.
 
 ## Funding
 The RevelioNN library was developed in the scope of the project 22-11-00214, funded by the Russian Science Foundation (RSF).
